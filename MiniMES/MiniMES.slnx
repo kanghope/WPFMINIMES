@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MiniMes.Client/MiniMes.Client.csproj" />
+  <Project Path="MiniMes.Domain/MiniMes.Domain.csproj" />
+  <Project Path="MiniMES.Infastructure/MiniMES.Infastructure.csproj" />
+</Solution>
