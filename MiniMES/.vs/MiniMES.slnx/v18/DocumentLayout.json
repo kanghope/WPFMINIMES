@@ -142,7 +142,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 11,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -170,18 +170,6 @@
               "RelativeToolTip": "MiniMes.Client\\Views\\WorkOrderListView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-12-24T06:58:24.925Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "WorkResultListView.xaml",
-              "DocumentMoniker": "D:\\wpfminmes\\MiniMES\\MiniMes.Client\\Views\\WorkResultListView.xaml",
-              "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkResultListView.xaml",
-              "ToolTip": "D:\\wpfminmes\\MiniMES\\MiniMes.Client\\Views\\WorkResultListView.xaml",
-              "RelativeToolTip": "MiniMes.Client\\Views\\WorkResultListView.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-12-24T05:22:14.447Z",
               "EditorCaption": ""
             },
             {
@@ -256,9 +244,21 @@
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\WorkOrderEditViewModel.cs",
               "ToolTip": "D:\\wpfminmes\\MiniMES\\MiniMes.Client\\ViewModels\\WorkOrderEditViewModel.cs",
               "RelativeToolTip": "MiniMes.Client\\ViewModels\\WorkOrderEditViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-24T05:02:07.999Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "WorkResultListView.xaml",
+              "DocumentMoniker": "D:\\wpfminmes\\MiniMES\\MiniMes.Client\\Views\\WorkResultListView.xaml",
+              "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkResultListView.xaml",
+              "ToolTip": "D:\\wpfminmes\\MiniMES\\MiniMes.Client\\Views\\WorkResultListView.xaml",
+              "RelativeToolTip": "MiniMes.Client\\Views\\WorkResultListView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-24T05:22:14.447Z",
               "EditorCaption": ""
             },
             {
