@@ -12,4 +12,9 @@
     <ProjectReference Include="..\MiniMES.Infastructure\MiniMES.Infastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Fonts\" />
+    <Folder Include="Themes\" />
+  </ItemGroup>
+
 </Project>

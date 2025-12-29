@@ -20,7 +20,7 @@ namespace MiniMes.Client.ViewModels
         // DB 서비스
 
         private readonly WorkResultService _resultService = new WorkResultService(); // 의존성 주입 (간소화)
-
+        //private readonly IWorkResultService _resultService;
 
 
 
@@ -100,23 +100,16 @@ namespace MiniMes.Client.ViewModels
         public WorkResultRegisterViewModel(WorkOrderDto workOrder)
 
         {
-
-
-
-            _workOrder = workOrder;
+             _workOrder = workOrder;
 
             _goodQuantity = 0; // 초기값 설정
-
             _badQuantity = 0;
-
             IsSaved = false;
-
-
 
             RegisterCommand = new RelayCommand(ExecuteRegisterCommand, CanExecuteRegisterCommand);
 
             Validate(); // 초기 유효성 검사
-
+            
         }
 
 
@@ -134,51 +127,28 @@ namespace MiniMes.Client.ViewModels
 
 
         private void ExecuteRegisterCommand()
-
         {
-
             // 1. DTO 생성
-
             var resultDto = new WorkResultDto
-
             {
-
                 WorkOrderId = _workOrder.Id,
-
                 GoodQuantity = this.GoodQuantity,
-
                 BadQuantity = this.BadQuantity,
-
                 ResultDate = DateTime.Now
-
             };
 
-
-
             try
-
             {
-
                 // 2. 서비스 호출: 실적 등록 및 WO 상태 완료 처리
-
                 _resultService.RegisterWorkResult(resultDto);
-
                 IsSaved = true;
-
             }
-
             catch (Exception ex)
-
             {
-
                 // DB 저장 실패 시 처리
-
                 MessageBox.Show($"실적 등록 중 오류 발생: {ex.Message}", "DB 오류", MessageBoxButton.OK, MessageBoxImage.Error);
-
                 IsSaved = false;
-
             }
-
         }
 
 
@@ -192,39 +162,22 @@ namespace MiniMes.Client.ViewModels
 
 
         public bool Validate()
-
         {
-
             ValidationMessage = string.Empty;
 
-
-
             if (GoodQuantity < 0 || BadQuantity < 0)
-
             {
-
                 ValidationMessage += "수량은 0 미만일 수 없습니다.\n";
-
             }
-
-
 
             // 총 생산 수량 (양품 + 불량)이 지시 수량보다 많으면 경고
-
             if (GoodQuantity + BadQuantity > OrderQuantity)
-
             {
-
                 ValidationMessage += $"총 실적 수량({GoodQuantity + BadQuantity})이 지시 수량({OrderQuantity})보다 많습니다.\n";
-
             }
 
-
-
             // 필수 입력 확인은 없으므로, ValidationMessage가 비어있지 않으면 유효성 실패
-
             return string.IsNullOrEmpty(ValidationMessage);
-
         }
 
 

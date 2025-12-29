@@ -1,14 +1,14 @@
 {
   "format": 1,
   "restore": {
-    "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj": {}
+    "D:\\wpfminmes\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj": {}
   },
   "projects": {
-    "D:\\WPFMINIMES\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj": {
+    "D:\\wpfminmes\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj": {
       "restore": {
-        "projectUniqueName": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj",
+        "projectUniqueName": "D:\\wpfminmes\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj",
         "projectName": "MiniMes.Domain",
-        "projectPath": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj",
+        "projectPath": "D:\\wpfminmes\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj",
         "UsingMicrosoftNETSdk": false,
         "frameworks": {
           "net472": {
@@ -20,20 +20,20 @@
         "net472": {}
       }
     },
-    "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj": {
+    "D:\\wpfminmes\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
+        "projectUniqueName": "D:\\wpfminmes\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
         "projectName": "MiniMES.Infastructure",
-        "projectPath": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
-        "packagesPath": "C:\\Users\\tankang\\.nuget\\packages\\",
-        "outputPath": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\obj\\",
+        "projectPath": "D:\\wpfminmes\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
+        "packagesPath": "C:\\Users\\tansa\\.nuget\\packages\\",
+        "outputPath": "D:\\wpfminmes\\MiniMES\\MiniMES.Infastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tankang\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\tansa\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -48,8 +48,8 @@
           "net10.0-windows7.0": {
             "targetAlias": "net10.0-windows",
             "projectReferences": {
-              "D:\\WPFMINIMES\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj": {
-                "projectPath": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj"
+              "D:\\wpfminmes\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj": {
+                "projectPath": "D:\\wpfminmes\\MiniMES\\MiniMes.Domain\\MiniMes.Domain.csproj"
               }
             }
           }
@@ -94,7 +94,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

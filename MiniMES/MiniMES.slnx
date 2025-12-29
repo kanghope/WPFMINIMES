@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="MiniMes.Client/MiniMes.Client.csproj" />
-  <Project Path="MiniMes.Domain/MiniMes.Domain.csproj" />
+  <Project Path="MiniMes.Domain/MiniMes.Domain.csproj" Id="e280070a-9aa6-4584-8022-2974f5f54897" />
   <Project Path="MiniMES.Infastructure/MiniMES.Infastructure.csproj" />
 </Solution>

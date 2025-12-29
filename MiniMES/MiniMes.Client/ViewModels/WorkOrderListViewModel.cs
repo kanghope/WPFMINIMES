@@ -37,7 +37,7 @@ namespace MiniMes.Client.ViewModels
         // Service 인스턴스를 생성하여 DB 관련 작업은 이 객체를 통해 수행합니다.
 
         private readonly WorkOrderService _service = new WorkOrderService();
-
+        
 
 
 
@@ -193,7 +193,7 @@ namespace MiniMes.Client.ViewModels
         public WorkOrderListViewModel()
 
         {
-
+            
             // Command 초기화: RelayCommand를 사용하여 UI 이벤트와 C# 메서드를 연결합니다.
 
             // LoadCommand: 클릭 시 ExecuteLoadCommandAsync() 실행
@@ -232,7 +232,7 @@ namespace MiniMes.Client.ViewModels
 
             // [추가] RegisterResultCommand 초기화
 
-            RegisterResultCommand = new RelayCommand(ExecuteRegisterResultCommand, CanRegExecuteEditOrDeleteCommand);
+            RegisterResultCommand = new RelayCommand( ExecuteRegisterResultCommand, CanRegExecuteEditOrDeleteCommand);
 
             // --------------------------------
 
@@ -360,7 +360,7 @@ namespace MiniMes.Client.ViewModels
 
         }
 
-        private void ExecuteRegisterResultCommand()
+        private async void ExecuteRegisterResultCommand()
 
         {
 
@@ -388,7 +388,7 @@ namespace MiniMes.Client.ViewModels
 
                 // DB 저장 후 WorkOrder 상태가 완료로 변경되었을 것이므로 목록을 갱신
 
-                ExecuteLoadCommandAsync();
+                await ExecuteLoadCommandAsync();
 
                 MessageBox.Show("실적이 성공적으로 등록되었으며, 작업 지시가 완료 처리되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
 
