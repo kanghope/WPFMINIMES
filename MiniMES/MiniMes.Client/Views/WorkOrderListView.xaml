@@ -6,6 +6,20 @@
     <Window.DataContext>
         <vm:WorkOrderListViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MetroTextBoxStyle}">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -24,25 +38,50 @@
         </DataGrid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
 
-            <Button Content="새로 고침" Command="{Binding LoadCommand}" Margin="5" Padding="10,5"/>
+            <Button Content="새로 고침" 
+                    Command="{Binding LoadCommand}" 
+                    Margin="5"
+                    MinWidth="70" 
+                    Cursor="Hand"
+                    Style="{StaticResource MetroBlueButtonStyle}"
+                    />
 
-            <Button Content="지시 등록" Command="{Binding AddCommand}" Margin="5" Padding="10,5"/>
+            <Button Content="지시 등록" Command="{Binding AddCommand}" 
+                    Margin="5" Height="30"  
+MinWidth="70" 
+Cursor="Hand"
+Style="{StaticResource MetroBlueButtonStyle}"/>
 
-            <Button Content="지시 수정" Command="{Binding EditCommand}" Margin="5" Padding="10,5"/>
+            <Button Content="지시 수정" Command="{Binding EditCommand}" Margin="5"
+MinWidth="70" 
+Cursor="Hand"
+Style="{StaticResource MetroBlueButtonStyle}"/>
 
-            <Button Content="지시 삭제" Command="{Binding DeleteCommand}" Margin="5" Padding="10,5"/>
+            <Button Content="지시 삭제" Command="{Binding DeleteCommand}" Margin="5"
+MinWidth="70" 
+Cursor="Hand"
+Style="{StaticResource MetroBlueButtonStyle}"/>
 
 
 
             <Separator Margin="10,0"/>
 
-            <Button Content="작업 시작" Command="{Binding StartWorkCommand}" Margin="5" Padding="10,5"/>
+            <Button Content="작업 시작" Command="{Binding StartWorkCommand}" Margin="5"
+MinWidth="70" 
+Cursor="Hand"
+Style="{StaticResource MetroBlueButtonStyle}"/>
 
             <!--<Button Content="작업 완료" Command="{Binding CompleteWorkCommand}" Margin="5" Padding="10,5"/>-->
 
-            <Button Content="실적 등록/완료" Command="{Binding RegisterResultCommand}" Margin="5" Padding="10,5"/>
+            <Button Content="실적 등록/완료" Command="{Binding RegisterResultCommand}" Margin="5"
+MinWidth="120" 
+Cursor="Hand"
+Style="{StaticResource MetroBlueButtonStyle}"/>
 
-            <Button Content="실적 조회" Command="{Binding ViewResultsCommand}" Margin="5" Padding="10,5" />
+            <Button Content="실적 조회" Command="{Binding ViewResultsCommand}" Margin="5"
+MinWidth="70" 
+Cursor="Hand"
+Style="{StaticResource MetroBlueButtonStyle}" />
 
         </StackPanel>
 

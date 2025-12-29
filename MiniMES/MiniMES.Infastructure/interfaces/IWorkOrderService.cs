@@ -18,17 +18,17 @@ namespace MiniMes.Infrastructure.Interfaces
 
         Task<List<WorkOrderDto>> GetAllWorkOrdersAsync();
 
-        void CreateWorkOrder(WorkOrderDto dto);
+        Task CreateWorkOrder(WorkOrderDto dto);
 
-        void UpdateWorkOrder(WorkOrderDto dto);
+        Task UpdateWorkOrder(WorkOrderDto dto);
 
-        void DeleteWorkOrder(int workOrderId);
+        Task DeleteWorkOrder(int workOrderId);
 
 
 
         // --- 새로 추가된 메서드 ---
 
-        void UpdateWorkOrderStatus(int id, WorkOrderStatus newStatus);
+        Task UpdateWorkOrderStatus(int id, WorkOrderStatus newStatus);
 
     }
 

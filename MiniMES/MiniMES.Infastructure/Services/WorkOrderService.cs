@@ -1,4 +1,4 @@
-﻿using MiniMes.Domain.Commons;// WorkOrderStatus Enum 사용
+﻿using MiniMes.Domain.Commons;
 using MiniMes.Domain.DTOs;
 using MiniMes.Domain.Entities;
 using MiniMes.Infrastructure.Interfaces;
@@ -6,250 +6,136 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks; // 비동기(기다려주기) 기능을 위해 꼭 필요해요!
 using MiniMes.Infrastructure.Data;
 
 namespace MiniMes.Infrastructure.Services
-
 {
-
+    // 이 클래스는 작업지시(주문)를 DB에 넣고, 빼고, 고치는 '창고지기'입니다.
     public class WorkOrderService : IWorkOrderService
-
     {
-
-        // 1. 전체 작업 지시 목록 조회
-
+        // ---------------------------------------------------------------------
+        // 1. 모든 작업지시 목록 가져오기 (창고 뒤져서 다 보여주기)
+        // ---------------------------------------------------------------------
         public async Task<List<WorkOrderDto>> GetAllWorkOrdersAsync()
-
         {
-
+            // using: DB 연결 상자를 열고, 작업이 끝나면 자동으로 안전하게 닫습니다.
             using (var context = new MesDbContext())
-
             {
-
-                // LINQ를 사용하여 DB 쿼리
-
+                // DB에서 필요한 정보들만 쏙쏙 골라내서 가져옵니다 (Select).
+                // ToListAsync: "데이터가 많을 수 있으니 다 가져올 때까지 기다려줄게"라는 뜻입니다.
                 var entities = await context.WorkOrders.Select(e => new
-
                 {
-
                     e.WO_ID,
-
                     e.ITEM_CODE,
-
                     e.WO_QTY,
-
                     e.WO_STATUS,
-
                     e.WO_DATE,
-
                     e.UPDATED_AT,
-
                     e.CREATED_AT
-
                 }).ToListAsync();
 
-
-
-                // Entity 목록을 DTO 목록으로 변환 (실무에서는 AutoMapper 사용 권장)
-
+                // DB에서 꺼낸 원본 데이터(Entity)를 화면에 보여주기 좋은 형태(Dto)로 예쁘게 포장해서 돌려줍니다.
                 return entities.Select(e => new WorkOrderDto
-
                 {
-
                     Id = e.WO_ID,
-
                     ItemCode = e.ITEM_CODE,
-
                     Quantity = e.WO_QTY,
-
                     Status = e.WO_STATUS
-
                 }).ToList();
-
             }
-
         }
 
-
-
-        // 2. 새로운 작업 지시 등록
-
-        public void CreateWorkOrder(WorkOrderDto dto)
-
+        // ---------------------------------------------------------------------
+        // 2. 새 작업지시 등록 (새 주문서 작성해서 창고에 넣기)
+        // ---------------------------------------------------------------------
+        public async Task CreateWorkOrder(WorkOrderDto dto)
         {
-
             using (var context = new MesDbContext())
-
             {
+                var now = DateTime.Now; // 현재 시간 기록
 
-                var now = DateTime.Now;
-
-                // DTO를 Entity로 변환
-
+                // 사용자가 입력한 내용(dto)을 DB 전용 종이(Entity)에 옮겨 적습니다.
                 var newEntity = new WorkOrderEntity
-
                 {
-
                     ITEM_CODE = dto.ItemCode,
-
-                    //WO_DATE = DateTime.Now,
-
                     WO_QTY = dto.Quantity,
-
-                    WO_STATUS = WorkOrderStatusExtensions.ToDbCode(WorkOrderStatus.Wait), // 초기 상태: 대기
-
-
-
-                    // DB의 NOT NULL 컬럼 처리
-
-                    WO_DATE = now.Date, // DB 스키마가 DATE이므로 날짜만 저장
-
-                    //CREATED_AT = now   // 생성 시간 설정
-
-                    UPDATED_AT = now    // 초기 수정 시간 설정
-
-
-
+                    // 처음 등록하면 무조건 '대기(Wait)' 상태로 시작합니다.
+                    WO_STATUS = WorkOrderStatusExtensions.ToDbCode(WorkOrderStatus.Wait),
+                    WO_DATE = now.Date,
+                    UPDATED_AT = now
                 };
 
-
-
+                // 창고에 새 종이를 집어넣고...
                 context.WorkOrders.Add(newEntity);
-
-                context.SaveChanges(); // DB에 반영
-
+                // "진짜로 저장해!"라고 확정을 짓습니다. (이때 DB에 실제로 들어갑니다)
+                await context.SaveChangesAsync();
             }
-
         }
 
-
-
         // ---------------------------------------------------------------------
-
-        // 3. 작업 지시 수정
-
+        // 3. 작업지시 수정 (이미 있는 주문서 내용 고치기)
         // ---------------------------------------------------------------------
-
-        public void UpdateWorkOrder(WorkOrderDto dto)
-
+        public async Task UpdateWorkOrder(WorkOrderDto dto)
         {
-
             using (var context = new MesDbContext())
-
             {
+                // 수정할 주문서 번호(Id)를 가지고 창고에서 딱 하나를 찾아냅니다.
+                var entity = await context.WorkOrders.SingleOrDefaultAsync(e => e.WO_ID == dto.Id);
 
-                var entity = context.WorkOrders.SingleOrDefault(e => e.WO_ID == dto.Id);
+                if (entity != null) // 주문서를 찾았다면?
+                {
+                    // 새로운 내용으로 덮어씁니다.
+                    entity.ITEM_CODE = dto.ItemCode;
+                    entity.WO_QTY = dto.Quantity;
+                    entity.UPDATED_AT = DateTime.Now; // 언제 고쳤는지 기록!
+
+                    // 고친 내용을 확정 저장합니다.
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 4. 작업지시 삭제 (창고에서 주문서 찢어버리기)
+        // ---------------------------------------------------------------------
+        public async Task DeleteWorkOrder(int workOrderId)
+        {
+            using (var context = new MesDbContext())
+            {
+                // 삭제할 주문서를 번호로 찾습니다.
+                var entity = await context.WorkOrders.SingleOrDefaultAsync(e => e.WO_ID == workOrderId);
 
                 if (entity != null)
-
                 {
+                    // 목록에서 제거하고...
+                    context.WorkOrders.Remove(entity);
+                    // DB에서도 완전히 지웁니다.
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
 
-                    // DTO의 변경된 값을 Entity에 반영
+        // ---------------------------------------------------------------------
+        // 5. 상태만 바꾸기 (예: '대기'중인 주문을 '요리중'으로 바꾸기)
+        // ---------------------------------------------------------------------
+        public async Task UpdateWorkOrderStatus(int id, WorkOrderStatus newStatus)
+        {
+            using (var context = new MesDbContext())
+            {
+                // 번호로 주문서를 찾아서...
+                var entity = await context.WorkOrders.SingleOrDefaultAsync(e => e.WO_ID == id);
 
-                    entity.ITEM_CODE = dto.ItemCode;
-
-                    entity.WO_QTY = dto.Quantity;
-
-                    // 수정 시간 갱신 (반드시 필요)
-
+                if (entity != null)
+                {
+                    // 상태 정보만 새로 갈아 끼웁니다. (ToDbCode는 Enum을 "W" 같은 문자로 바꿔줍니다)
+                    entity.WO_STATUS = newStatus.ToDbCode();
                     entity.UPDATED_AT = DateTime.Now;
 
-
-
-                    context.SaveChanges();//db에 반영
-
+                    // 변경 사항을 저장합니다.
+                    await context.SaveChangesAsync();
                 }
-
             }
-
         }
-
-
-
-        // ---------------------------------------------------------------------
-
-        // 4. 작업 지시 삭제
-
-        // ---------------------------------------------------------------------
-
-        public void DeleteWorkOrder(int workOrderId)
-
-        {
-
-            using (var context = new MesDbContext())
-
-            {
-
-                var entity = context.WorkOrders.SingleOrDefault(e => e.WO_ID == workOrderId);
-
-                if (entity != null)
-
-                {
-
-                    // 삭제 전 관련 실적(WorkResult)도 삭제해야 DB 무결성이 유지됩니다.
-
-                    //context.WorkResults.RemoveRange(context.WorkResults.Where(r => r.WO_ID == workOrderId));
-
-
-
-                    context.WorkOrders.Remove(entity);
-
-                    context.SaveChanges();
-
-                }
-
-            }
-
-        }
-
-
-
-        // --- 5. 작업 상태 업데이트 메서드 구현 (신규) ---
-
-        public void UpdateWorkOrderStatus(int id, WorkOrderStatus newStatus)
-
-        {
-
-            using (var context = new MesDbContext())
-
-            {
-
-                var entity = context.WorkOrders.SingleOrDefault(e => e.WO_ID == id);
-
-
-
-                if (entity == null)
-
-                {
-
-                    // ID에 해당하는 작업 지시가 없으면 처리 중단
-
-                    return;
-
-                }
-
-
-
-                // Enum을 DB 코드(예: "W", "P", "C")로 변환하여 할당
-
-                entity.WO_STATUS = newStatus.ToDbCode();
-
-
-
-                // 업데이트 시점 기록
-
-                entity.UPDATED_AT = DateTime.Now;
-
-
-
-                context.SaveChanges();
-
-            }
-
-        }
-
     }
-
 }
