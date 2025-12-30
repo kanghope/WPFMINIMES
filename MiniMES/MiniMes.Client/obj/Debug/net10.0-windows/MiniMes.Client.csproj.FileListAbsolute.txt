@@ -94,3 +94,5 @@ D:\wpfminmes\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\ref\MiniMes.Client
 D:\wpfminmes\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Themes\Generic.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Themes\Generic.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.sourcelink.json
+D:\WPFMINIMES\MiniMES\MiniMes.Client\bin\Debug\net10.0-windows\Microsoft.Extensions.DependencyInjection.dll
+D:\WPFMINIMES\MiniMES\MiniMes.Client\bin\Debug\net10.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
