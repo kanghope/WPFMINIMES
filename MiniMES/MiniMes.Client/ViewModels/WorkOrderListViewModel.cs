@@ -1,16 +1,18 @@
 ﻿using MiniMes.Client;
+using MiniMes.Client.Helpers;
 using MiniMes.Client.ViewModels;
+using MiniMes.Domain.Commons;
+using MiniMes.Domain.DTOs;
+using MiniMes.Infrastructure.Interfaces;
+using MiniMes.Infrastructure.Services;
 using System;
 using System.Collections.ObjectModel; // UI와 실시간으로 연동되는 리스트를 쓰기 위함
 using System.ComponentModel;          // "데이터 바뀌었으니 화면 새로 그려!"라고 알려주는 기능
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;         // 비동기(딴짓하면서 일하기)를 위한 도구
 using System.Windows;
 using System.Windows.Input;           // 버튼 클릭 같은 명령을 처리하기 위함
-using MiniMes.Client.Helpers;
-using MiniMes.Domain.Commons;
-using MiniMes.Domain.DTOs;
-using MiniMes.Infrastructure.Services;
 
 
 namespace MiniMes.Client.ViewModels
@@ -18,8 +20,13 @@ namespace MiniMes.Client.ViewModels
     // INotifyPropertyChanged: "내 데이터가 바뀌면 화면에 알려주겠다"는 약속입니다.
     public class WorkOrderListViewModel : INotifyPropertyChanged
     {
-        // [1. 도구들] DB와 통신하거나 데이터를 가져오는 서비스 객체들입니다.
-        private readonly WorkOrderService _service = new WorkOrderService();
+        /*1. 왜 실무에서는 직접 new를 하지 않을까요?
+        부품 갈아끼우기 편리함: 나중에 Oracle DB에서 MySQL로 바꾸거나, 진짜 PLC 대신 가상 PLC 서비스로 바꾸고 싶을 때, 모든 코드를 고칠 필요 없이 Program.cs에서 딱 한 줄만 수정하면 됩니다.
+        성능 관리: DB 연결 객체(DbContext) 등을 매번 만들지 않고 하나로 돌려쓰거나(Singleton), 필요할 때만 깔끔하게 생성해서 관리하기 좋습니다.
+        테스트 용이성: 가짜(Mock) 데이터를 보내주는 테스트용 서비스를 쉽게 연결할 수 있습니다.
+        // [1. 도구들] DB와 통신하거나 데이터를 가져오는 서비스 객체들입니다.*/
+        //private readonly WorkOrderService _service = new WorkOrderService();
+        private readonly IWorkOrderService _service;//
         private readonly WorkResultService _WorkResultsService = new WorkResultService();
 
         // [2. 데이터 저장소] 화면에 보여줄 실제 값들입니다.
@@ -65,8 +72,9 @@ namespace MiniMes.Client.ViewModels
         public event Action<WorkResultListViewModel, string> OpenResultWindowRequested;
 
         // [5. 생성자] 이 클래스가 태어날 때 가장 먼저 실행되는 곳입니다.
-        public WorkOrderListViewModel()
+        public WorkOrderListViewModel(IWorkOrderService workOrderService)
         {
+            _service = workOrderService;
             // 리모컨 버튼(Command)과 실제 행동(Method)을 연결해줍니다.
             // async/await는 "작업이 끝날 때까지 기다려줄게, 하지만 화면은 멈추지 마"라는 뜻입니다.
             LoadCommand = new RelayCommand(async () => await ExecuteLoadCommandAsync());

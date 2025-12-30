@@ -16,6 +16,8 @@ namespace MiniMes.Client.ViewModels
         // [수정] 서비스를 인터페이스 타입으로 필드 선언
 
         //private readonly IWorkOrderService _workOrderService;
+       //22222222222222222
+
 
         // DB 서비스
 
@@ -100,6 +102,7 @@ namespace MiniMes.Client.ViewModels
         public WorkResultRegisterViewModel(WorkOrderDto workOrder)
 
         {
+             //_resultService = resultService;
              _workOrder = workOrder;
 
             _goodQuantity = 0; // 초기값 설정
