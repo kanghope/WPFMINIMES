@@ -52,7 +52,7 @@ namespace MiniMes.Client.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/MiniMes.Client;component/views/workresultlistview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/MiniMes.Client;V1.0.0.0;component/views/workresultlistview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\WorkResultListView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

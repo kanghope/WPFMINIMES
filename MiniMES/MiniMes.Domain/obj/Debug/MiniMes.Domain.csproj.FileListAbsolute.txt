@@ -1,12 +1,3 @@
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.dll.config
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.dll
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.pdb
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\System.ComponentModel.Annotations.dll
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.csproj.AssemblyReference.cache
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.csproj.CoreCompileInputs.cache
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes..B01E5103.Up2Date
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.dll
-D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.pdb
 D:\wpfminmes\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.dll.config
 D:\wpfminmes\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.dll
 D:\wpfminmes\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.pdb
@@ -16,3 +7,12 @@ D:\wpfminmes\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.csproj.CoreCompileI
 D:\wpfminmes\MiniMES\MiniMes.Domain\obj\Debug\MiniMes..B01E5103.Up2Date
 D:\wpfminmes\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.dll
 D:\wpfminmes\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.pdb
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.dll.config
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.dll
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\MiniMes.Domain.pdb
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\bin\Debug\System.ComponentModel.Annotations.dll
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.csproj.AssemblyReference.cache
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.csproj.CoreCompileInputs.cache
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes..B01E5103.Up2Date
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.dll
+D:\WPFMINIMES\MiniMES\MiniMes.Domain\obj\Debug\MiniMes.Domain.pdb

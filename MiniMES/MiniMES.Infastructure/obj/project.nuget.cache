@@ -12,5 +12,15 @@
     "C:\\Users\\tankang\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512",
     "C:\\Users\\tankang\\.nuget\\packages\\system.data.sqlclient\\4.8.6\\system.data.sqlclient.4.8.6.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "패키지 취약성 데이터를 가져오는 동안 오류가 발생했습니다. https://api.nuget.org/v3/index.json 원본에 대한 서비스 인덱스를 로드할 수 없습니다.",
+      "projectPath": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
+      "targetGraphs": []
+    }
+  ]
 }
