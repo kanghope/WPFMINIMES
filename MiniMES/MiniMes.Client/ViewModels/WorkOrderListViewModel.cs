@@ -27,7 +27,8 @@ namespace MiniMes.Client.ViewModels
         // [1. 도구들] DB와 통신하거나 데이터를 가져오는 서비스 객체들입니다.*/
         //private readonly WorkOrderService _service = new WorkOrderService();
         private readonly IWorkOrderService _service;//
-        private readonly WorkResultService _WorkResultsService = new WorkResultService();
+        //private readonly WorkResultService _WorkResultsService = new WorkResultService();
+        private readonly IWorkResultService _WorkResultsService;
 
         // [2. 데이터 저장소] 화면에 보여줄 실제 값들입니다.
 
@@ -72,8 +73,9 @@ namespace MiniMes.Client.ViewModels
         public event Action<WorkResultListViewModel, string> OpenResultWindowRequested;
 
         // [5. 생성자] 이 클래스가 태어날 때 가장 먼저 실행되는 곳입니다.
-        public WorkOrderListViewModel(IWorkOrderService workOrderService)
+        public WorkOrderListViewModel(IWorkOrderService workOrderService, IWorkResultService WorkResultsService)
         {
+            _WorkResultsService = WorkResultsService;
             _service = workOrderService;
             // 리모컨 버튼(Command)과 실제 행동(Method)을 연결해줍니다.
             // async/await는 "작업이 끝날 때까지 기다려줄게, 하지만 화면은 멈추지 마"라는 뜻입니다.
@@ -140,7 +142,7 @@ namespace MiniMes.Client.ViewModels
             {
                 var savedDto = editVm.CommitChanges();
                 // 비동기 서비스 메서드가 없다면 Task.Run으로 감싸 UI 멈춤 방지
-                await Task.Run(() => _service.CreateWorkOrder(savedDto));
+                await _service.CreateWorkOrder(savedDto);
 
                 await ExecuteLoadCommandAsync();
                 MessageBox.Show("정상적으로 등록 되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -158,7 +160,7 @@ namespace MiniMes.Client.ViewModels
             {
                 var updatedDto = editVm.CommitChanges();
                 // DB 반영
-                await Task.Run(() => _service.UpdateWorkOrder(updatedDto));
+                await _service.UpdateWorkOrder(updatedDto);
                 // 목록 갱신
                 await ExecuteLoadCommandAsync();
             }
@@ -174,7 +176,7 @@ namespace MiniMes.Client.ViewModels
 
             if (result == MessageBoxResult.Yes)
             {
-                await Task.Run(() => _service.DeleteWorkOrder(SelectedWorkOrder.Id));
+                await _service.DeleteWorkOrder(SelectedWorkOrder.Id);
                 await ExecuteLoadCommandAsync();
                 MessageBox.Show("정상적으로 삭제 되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -184,7 +186,7 @@ namespace MiniMes.Client.ViewModels
         {
             if (SelectedWorkOrder == null) return;
             // 상태 업데이트 비동기 처리
-            await Task.Run(() => _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Processing));
+            await _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Processing);
             await ExecuteLoadCommandAsync();
         }
 
@@ -192,7 +194,8 @@ namespace MiniMes.Client.ViewModels
         {
             if (SelectedWorkOrder == null) return;
             // 상태 업데이트 비동기 처리
-            await Task.Run(() => _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Complete));
+            //await Task.Run(() => _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Complete));
+            await _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Complete);
             await ExecuteLoadCommandAsync();
         }
 
@@ -202,8 +205,9 @@ namespace MiniMes.Client.ViewModels
             var registerVm = new WorkResultRegisterViewModel(SelectedWorkOrder);
 
             OpenRegisterWindowRequested?.Invoke(registerVm, $"실적 등록: {SelectedWorkOrder.ItemCode}");
-
-            if (registerVm.IsSaved)
+            // 2. 창이 닫힌 후, 코드는 바로 다음 줄로 넘어옵니다.
+            // 3. 이때 'DialogResult = true'가 실행되면서 동시에 ViewModel의 'IsSaved'도 true가 되었을 겁니다.
+            if (registerVm.IsSaved)// <--- 여기서 DialogResult 대신 IsSaved 변수로 성공 여부를 체크 중!
             {
                 await ExecuteLoadCommandAsync();
                 MessageBox.Show("실적이 성공적으로 등록되었으며, 작업 지시가 완료 처리되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -213,6 +217,7 @@ namespace MiniMes.Client.ViewModels
         private void ExecuteViewResultsCommnad()
         {
             if (SelectedWorkOrder == null) return;
+            // 주입받은 필드(_workResultService)를 그대로 자식 ViewModel에 넘겨줍니다.
             var listViewModel = new WorkResultListViewModel(SelectedWorkOrder, _WorkResultsService);
             OpenResultWindowRequested?.Invoke(listViewModel, $"작업 실적 조회: {SelectedWorkOrder.ItemCode}");
         }
