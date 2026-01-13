@@ -72,7 +72,14 @@ namespace MiniMes.Client.ViewModels
         public event Action<WorkOrderEditViewModel, string> OpenEditWindowRequested;
         public event Action<WorkResultListViewModel, string> OpenResultWindowRequested;
 
+        // A. XAML 디자인 및 기본 생성을 위한 "빈 생성자" (추가)
+        public WorkOrderListViewModel() : this(new WorkOrderService(), new WorkResultService()) // 아래 B번 생성자를 호출하며 실제 객체를 전달
+        {
+            // 아무것도 적지 않아도 됩니다. (위의 : this(...)가 알아서 연결해줍니다.)
+        }
+
         // [5. 생성자] 이 클래스가 태어날 때 가장 먼저 실행되는 곳입니다.
+        // B. 실제 프로그램 실행 및 테스트를 위한 "기존 생성자" (유지)
         public WorkOrderListViewModel(IWorkOrderService workOrderService, IWorkResultService WorkResultsService)
         {
             _WorkResultsService = WorkResultsService;

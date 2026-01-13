@@ -548,7 +548,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\tankang\\.nuget\\packages\\": {},
+    "C:\\Users\\tansa\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
@@ -557,14 +557,14 @@
       "projectUniqueName": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\MiniMes.Client.csproj",
       "projectName": "MiniMes.Client",
       "projectPath": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\MiniMes.Client.csproj",
-      "packagesPath": "C:\\Users\\tankang\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\tansa\\.nuget\\packages\\",
       "outputPath": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\tankang\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\tansa\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -625,7 +625,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
