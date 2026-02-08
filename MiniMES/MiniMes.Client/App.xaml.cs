@@ -4,6 +4,7 @@ using MiniMes.Infrastructure.Services;
 using MiniMes.Client.ViewModels;
 using System;
 using System.Windows;
+using MiniMES.Infastructure.Services;
 
 namespace MiniMes.Client
 {
@@ -27,6 +28,7 @@ namespace MiniMes.Client
             // 1. 서비스 등록 (IWorkOrderService를 요청하면 WorkOrderService를 준다)
             // AddSingleton: 프로그램이 켜져 있는 동안 딱 하나만 만들어서 공유합니다.
             services.AddSingleton<IWorkOrderService, WorkOrderService>();
+            services.AddSingleton<IWorkResultService, WorkResultServicePro>();
 
             // PLC 통신 서비스도 등록
             //services.AddSingleton<PlcCommunicationService>();

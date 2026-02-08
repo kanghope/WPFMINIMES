@@ -5,6 +5,7 @@ using MiniMes.Infrastructure.Data;
 using MiniMes.Infrastructure.Interfaces;// IWorkResultService 참조
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 
 namespace MiniMes.Infrastructure.Services
@@ -93,7 +94,7 @@ namespace MiniMes.Infrastructure.Services
 
         // ************************************************
 
-        public void RegisterWorkResult(WorkResultDto dto)
+        public async Task RegisterWorkResult(WorkResultDto dto)
 
         {
 
@@ -101,39 +102,28 @@ namespace MiniMes.Infrastructure.Services
 
             {
 
-                // 1. DTO를 Entity로 변환
-
+                // 1. DTO -> Entity 변환
                 var newResult = new WorkResultEntity
-
                 {
-
                     WO_ID = dto.WorkOrderId,
-
                     GOOD_QTY = dto.GoodQuantity,
-
                     BAD_QTY = dto.BadQuantity,
-
-                    RESULT_DATE = DateTime.Now // 실적 등록 시간 기록
-
+                    RESULT_DATE = DateTime.Now
                 };
 
-
-
-                // 2. 실적 저장
-
+                // 2. 실적 저장 (비동기)
                 context.WorkResults.Add(newResult);
 
-                context.SaveChanges();
+                // SaveChangesAsync를 사용하여 DB 저장이 끝날 때까지 비동기로 대기합니다.
+                await context.SaveChangesAsync();
 
             }
 
 
 
-            // 3. 작업 지시 상태를 '완료'로 업데이트 (WorkOrderService 사용)
-
-            // 실적 등록 후, 해당 작업 지시는 완료(Complete) 상태로 변경되어야 합니다.
-
-            _workOrderService.UpdateWorkOrderStatus(dto.WorkOrderId, WorkOrderStatus.Complete);
+            // 3. 작업 지시 상태 업데이트 (비동기 호출)
+            // _workOrderService의 메서드도 async Task로 구현되어 있어야 합니다.
+            await _workOrderService.UpdateWorkOrderStatus(dto.WorkOrderId, WorkOrderStatus.Complete);
 
         }
 
@@ -145,7 +135,7 @@ namespace MiniMes.Infrastructure.Services
 
         // ************************************************
 
-        public List<WorkResultDto> GetResultsByWorkOrder(int workOrderId)
+        public async Task<List<WorkResultDto>> GetResultsByWorkOrder(int workOrderId)
 
         {
 
@@ -153,13 +143,13 @@ namespace MiniMes.Infrastructure.Services
 
             {
 
-                var results = context.WorkResults
+                var results = await context.WorkResults
 
                     .Where(r => r.WO_ID == workOrderId)
 
                     .OrderByDescending(r => r.RESULT_DATE)
 
-                    .ToList();
+                    .ToListAsync();
 
 
 
