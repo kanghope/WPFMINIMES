@@ -42,8 +42,8 @@ namespace MiniMes.Client.ViewModels
         }
 
         // SelectedWorkOrder: 마우스로 클릭한 '그 줄'의 정보가 여기에 저장됩니다.
-        private WorkOrderDto _selectedWorkOrder;
-        public WorkOrderDto SelectedWorkOrder
+        private WorkOrderDto? _selectedWorkOrder;
+        public WorkOrderDto? SelectedWorkOrder
         {
             get => _selectedWorkOrder;
             set { _selectedWorkOrder = value; OnPropertyChanged(nameof(SelectedWorkOrder)); }
@@ -68,9 +68,9 @@ namespace MiniMes.Client.ViewModels
         public ICommand ViewResultsCommand { get; }    // 실적조회
 
         // [4. 창 띄우기 이벤트] "창 좀 열어줘!"라고 화면(View)에 보내는 신호들입니다.
-        public event Action<WorkResultRegisterViewModel, string> OpenRegisterWindowRequested;
-        public event Action<WorkOrderEditViewModel, string> OpenEditWindowRequested;
-        public event Action<WorkResultListViewModel, string> OpenResultWindowRequested;
+        public event Action<WorkResultRegisterViewModel, string>? OpenRegisterWindowRequested;
+        public event Action<WorkOrderEditViewModel, string>? OpenEditWindowRequested;
+        public event Action<WorkResultListViewModel, string>? OpenResultWindowRequested;
 
         // A. XAML 디자인 및 기본 생성을 위한 "빈 생성자" (추가)
         public WorkOrderListViewModel() : this(new WorkOrderService(), new WorkResultService()) // 아래 B번 생성자를 호출하며 실제 객체를 전달
@@ -98,7 +98,8 @@ namespace MiniMes.Client.ViewModels
             ViewResultsCommand = new RelayCommand(ExecuteViewResultsCommnad, CanExcuteViewResultsCommand);
 
             // 화면이 켜지자마자 데이터를 한 번 불러옵니다.
-            _ = ExecuteLoadCommandAsync();
+            _ = ExecuteLoadCommandAsync();//비동기 함수(async Task)를 호출할 때, 이 함수가 끝날 때까지 기다리지 않고
+                                          //**"결과는 나중에 알아서 나오겠지, 일단 난 내 할 일 하러 갈게"**라고 선언하는 것입니다.
         }
 
         // [6. 조건 체크] 버튼을 누를 수 있는 상태인지 검사합니다. (true면 버튼 활성화, false면 비활성화)
@@ -155,7 +156,7 @@ namespace MiniMes.Client.ViewModels
                 MessageBox.Show("정상적으로 등록 되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-
+        //지시수정
         private async Task ExecuteEditCommandAsync()
         {
             if (SelectedWorkOrder == null) return;
@@ -170,6 +171,8 @@ namespace MiniMes.Client.ViewModels
                 await _service.UpdateWorkOrder(updatedDto);
                 // 목록 갱신
                 await ExecuteLoadCommandAsync();
+
+                MessageBox.Show("수정 되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -188,7 +191,7 @@ namespace MiniMes.Client.ViewModels
                 MessageBox.Show("정상적으로 삭제 되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-
+        //작업지시 등록
         private async Task ExecuteStartWorkCommandAsync()
         {
             if (SelectedWorkOrder == null) return;

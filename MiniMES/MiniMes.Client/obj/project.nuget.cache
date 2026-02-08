@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "AHy8blmSwxY=",
+  "dgSpecHash": "EnxNjoWx0Ms=",
   "success": true,
   "projectFilePath": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\MiniMes.Client.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\tansa\\.nuget\\packages\\dapper\\2.1.66\\dapper.2.1.66.nupkg.sha512",
     "C:\\Users\\tansa\\.nuget\\packages\\entityframework\\6.5.1\\entityframework.6.5.1.nupkg.sha512",
     "C:\\Users\\tansa\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.1\\microsoft.extensions.dependencyinjection.10.0.1.nupkg.sha512",
     "C:\\Users\\tansa\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.1\\microsoft.extensions.dependencyinjection.abstractions.10.0.1.nupkg.sha512",
