@@ -95,7 +95,7 @@ namespace MiniMes.Client.ViewModels
             CompleteWorkCommand = new RelayCommand(async () => await ExecuteCompleteWorkCommandAsync(), CanExecuteCompleteWorkCommand);
 
             RegisterResultCommand = new RelayCommand(async () => await ExecuteRegisterResultCommandAsync(), CanRegExecuteEditOrDeleteCommand);
-            ViewResultsCommand = new RelayCommand(ExecuteViewResultsCommnad, CanExcuteViewResultsCommand);
+            ViewResultsCommand = new RelayCommand(async () => await ExecuteViewResultsCommnad(), CanExcuteViewResultsCommand);
 
             // 화면이 켜지자마자 데이터를 한 번 불러옵니다.
             _ = ExecuteLoadCommandAsync();//비동기 함수(async Task)를 호출할 때, 이 함수가 끝날 때까지 기다리지 않고
@@ -224,7 +224,7 @@ namespace MiniMes.Client.ViewModels
             }
         }
 
-        private void ExecuteViewResultsCommnad()
+        private async Task ExecuteViewResultsCommnad()
         {
             if (SelectedWorkOrder == null) return;
             // 주입받은 필드(_workResultService)를 그대로 자식 ViewModel에 넘겨줍니다.

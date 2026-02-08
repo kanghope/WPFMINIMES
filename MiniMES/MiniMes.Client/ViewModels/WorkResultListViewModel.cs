@@ -93,13 +93,13 @@ namespace MiniMes.Client.ViewModels
 
             // Command 초기화
 
-            LoadResultsCommand = new RelayCommand(ExecuteLoadResultsCommand);
+            LoadResultsCommand = new RelayCommand(async () => await ExecuteLoadResultsCommand());
 
 
 
             // 생성 시 즉시 데이터 로드
 
-            ExecuteLoadResultsCommand();
+            _= ExecuteLoadResultsCommand();
 
         }
 
@@ -111,7 +111,7 @@ namespace MiniMes.Client.ViewModels
 
         // ---------------------------------------------------------------------
 
-        private void ExecuteLoadResultsCommand()
+        private async Task ExecuteLoadResultsCommand()
 
         {
 
@@ -121,7 +121,7 @@ namespace MiniMes.Client.ViewModels
 
             // Service를 호출하여 특정 WorkOrder ID에 대한 실적 목록을 가져옵니다.
 
-            var data = _resultService.GetResultsByWorkOrder(_workOrder.Id);
+            var data = await _resultService.GetResultsByWorkOrder(_workOrder.Id);
 
 
 

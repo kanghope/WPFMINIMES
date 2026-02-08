@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiniMes.Client")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5af8b590f06122ee5cd74b34044a31d386a13447")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd058b53e09d825d844689d000aa3876a579fce7")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiniMes.Client")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiniMes.Client")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
