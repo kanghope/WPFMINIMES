@@ -40,6 +40,18 @@ namespace MiniMes.Client
             services.AddTransient<WorkResultListViewModel>();
             services.AddTransient<WorkResultRegisterViewModel>();
         }
+
+        // 1. App.xaml에서 Startup="OnStartup" 이라고 썼다면 
+        //    함수 이름도 똑같이 맞추고, 매개변수도 이벤트 형식을 따라야 합니다.
+        private void OnStartup(object sender, StartupEventArgs e)
+        {
+            // 여기서 아까 짰던 시작 로직을 넣습니다.
+            var viewModel = ServiceProvider?.GetService<WorkOrderListViewModel>();
+            var listView = new MiniMes.Client.Views.WorkOrderListView();
+
+            listView.DataContext = viewModel;
+            listView.Show();
+        }
     }
 
 }

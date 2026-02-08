@@ -6,7 +6,7 @@
 
              xmlns:local="clr-namespace:MiniMes.Client"
 
-             StartupUri="views/WorkOrderListView.xaml">
+             Startup="OnStartup">
 
     <Application.Resources>
 
