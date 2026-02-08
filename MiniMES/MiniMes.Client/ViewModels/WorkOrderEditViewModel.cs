@@ -56,8 +56,8 @@ namespace MiniMes.Client.ViewModels
         }
 
         // [_itemCode] 사용자가 입력창에 타이핑하는 품목코드 문자열입니다.
-        private string _itemCode;
-        public string ItemCode
+        private string? _itemCode;
+        public string? ItemCode
         {
             get { return _itemCode; }
             set
@@ -83,8 +83,8 @@ namespace MiniMes.Client.ViewModels
 
         // [ValidationMessage] 
         // 만약 수량을 -10이라고 쓰면, 화면 하단에 "1 이상 입력하세요"라고 띄워줄 글자 주머니입니다.
-        private string _validationMessage;
-        public string ValidationMessage
+        private string? _validationMessage;
+        public string? ValidationMessage
         {
             get => _validationMessage;
             private set { _validationMessage = value; OnPropertyChanged(nameof(ValidationMessage)); }
