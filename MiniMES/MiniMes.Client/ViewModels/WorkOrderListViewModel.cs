@@ -229,6 +229,8 @@ namespace MiniMes.Client.ViewModels
             if (SelectedWorkOrder == null) return;
             // 주입받은 필드(_workResultService)를 그대로 자식 ViewModel에 넘겨줍니다.
             var listViewModel = new WorkResultListViewModel(SelectedWorkOrder, _WorkResultsService);
+
+            await listViewModel.ExecuteLoadResultsCommand();
             OpenResultWindowRequested?.Invoke(listViewModel, $"작업 실적 조회: {SelectedWorkOrder.ItemCode}");
         }
 

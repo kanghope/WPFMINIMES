@@ -45,7 +45,7 @@
         </StackPanel>
 
         <DataGrid Grid.Row="1"
-
+                    Style="{StaticResource MetroDataGridStyle}"
                   ItemsSource="{Binding Results}"
 
                   AutoGenerateColumns="False" 
@@ -58,13 +58,13 @@
 
             <DataGrid.Columns>
 
-                <DataGridTextColumn Header="실적 ID" Binding="{Binding ResultId}" Width="60"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="실적 ID" Binding="{Binding ResultId}" Width="60"/>
 
-                <DataGridTextColumn Header="양품 수량" Binding="{Binding GoodQuantity}" Width="*"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="양품 수량" Binding="{Binding GoodQuantity}" Width="*"/>
 
-                <DataGridTextColumn Header="불량 수량" Binding="{Binding BadQuantity}" Width="*"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="불량 수량" Binding="{Binding BadQuantity}" Width="*"/>
 
-                <DataGridTextColumn Header="등록 시간" Binding="{Binding ResultDate, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="2*"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="등록 시간" Binding="{Binding ResultDate, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="2*"/>
 
             </DataGrid.Columns>
 

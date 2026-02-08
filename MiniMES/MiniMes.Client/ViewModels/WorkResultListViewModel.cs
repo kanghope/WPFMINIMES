@@ -99,7 +99,7 @@ namespace MiniMes.Client.ViewModels
 
             // 생성 시 즉시 데이터 로드
 
-            _= ExecuteLoadResultsCommand();
+            //_= ExecuteLoadResultsCommand();
 
         }
 
@@ -111,7 +111,7 @@ namespace MiniMes.Client.ViewModels
 
         // ---------------------------------------------------------------------
 
-        private async Task ExecuteLoadResultsCommand()
+        public async Task ExecuteLoadResultsCommand()
 
         {
 
