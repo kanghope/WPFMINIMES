@@ -26,14 +26,34 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DataGrid Grid.Row="0" 
+                  Style="{StaticResource MetroDataGridStyle}"
                   ItemsSource="{Binding WorkOrders}" 
                   SelectedItem="{Binding SelectedWorkOrder}" 
                   AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="지시 ID" Binding="{Binding Id}" Width="60"/>
-                <DataGridTextColumn Header="품목 코드" Binding="{Binding ItemCode}" Width="*"/>
-                <DataGridTextColumn Header="지시 수량" Binding="{Binding Quantity}" Width="80"/>
-                <DataGridTextColumn Header="상태" Binding="{Binding DisplayStatus}" Width="80"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="지시 ID" Binding="{Binding Id}" Width="80"/>
+                <DataGridTextColumn   Header="품목 코드"  Binding="{Binding ItemCode}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="left" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="지시 수량" Binding="{Binding Quantity}" Width="80"/>
+                <DataGridTextColumn  Header="상태" Binding="{Binding DisplayStatus}"  Width="80">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Status}" Value="P">
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">

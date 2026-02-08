@@ -15,7 +15,7 @@ namespace MiniMES.Infastructure.Services
 {
     public class WorkResultServicePro : IWorkResultService
     {
-        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["MesDbConnection"].ConnectionString;
+        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["MesConnection"].ConnectionString;
 
         // 1. [활성화] IWorkOrderService 인터페이스 필드 선언
         private readonly IWorkOrderService _workOrderService;
