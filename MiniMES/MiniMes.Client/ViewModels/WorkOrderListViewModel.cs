@@ -195,9 +195,22 @@ namespace MiniMes.Client.ViewModels
         private async Task ExecuteStartWorkCommandAsync()
         {
             if (SelectedWorkOrder == null) return;
-            // 상태 업데이트 비동기 처리
-            await _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Processing);
-            await ExecuteLoadCommandAsync();
+
+            try
+            {
+                // 1. 상태 업데이트 시도
+                await _service.UpdateWorkOrderStatus(SelectedWorkOrder.Id, WorkOrderStatus.Processing);
+
+                // 2. 성공했으니 리스트 새로고침
+                await ExecuteLoadCommandAsync();
+
+                MessageBox.Show("작업이 시작되었습니다.", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                // DB 오류 등으로 실패했을 경우
+                MessageBox.Show($"작업 시작 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task ExecuteCompleteWorkCommandAsync()
