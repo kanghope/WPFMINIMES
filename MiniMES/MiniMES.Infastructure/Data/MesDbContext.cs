@@ -20,8 +20,8 @@ namespace MiniMes.Infrastructure.Data
         }
 
         // DBSet: 각 테이블에 대응되는 컬렉션입니다.
-        public DbSet<WorkOrderEntity> WorkOrders { get; set; }
-        public DbSet<WorkResultEntity> WorkResults { get; set; }
+        public DbSet<WorkOrderEntity>? WorkOrders { get; set; }
+        public DbSet<WorkResultEntity>? WorkResults { get; set; }
         // 추가적인 모델 설정이 필요할 경우 OnModelCreating 오버라이딩
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

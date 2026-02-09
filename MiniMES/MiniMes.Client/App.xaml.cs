@@ -33,6 +33,9 @@ namespace MiniMes.Client
             // PLC 통신 서비스도 등록
             //services.AddSingleton<PlcCommunicationService>();
 
+            // [추가] MainWindow를 컨테이너에 등록
+            services.AddTransient<MainWindow>();
+
             // 2. ViewModel 등록
             // AddTransient: 필요할 때마다(창을 열 때마다) 새로 만듭니다.
             services.AddTransient<WorkOrderListViewModel>();
@@ -45,12 +48,16 @@ namespace MiniMes.Client
         //    함수 이름도 똑같이 맞추고, 매개변수도 이벤트 형식을 따라야 합니다.
         private void OnStartup(object sender, StartupEventArgs e)
         {
+            /*
             // 여기서 아까 짰던 시작 로직을 넣습니다.
             var viewModel = ServiceProvider?.GetService<WorkOrderListViewModel>();
             var listView = new MiniMes.Client.Views.WorkOrderListView();
 
             listView.DataContext = viewModel;
-            listView.Show();
+            listView.Show();*/
+            var MainView = new MainWindow();
+            //var MainView = ServiceProvider?.GetService<MainWindow>();
+            MainView?.Show();
         }
     }
 

@@ -19,7 +19,7 @@ namespace MiniMes.Client.Views
     /// <summary>
     /// WorkOrderListView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class WorkOrderListView : Window
+    public partial class WorkOrderListView : UserControl
     {
         public WorkOrderListView()
         {

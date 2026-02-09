@@ -103,7 +103,7 @@ namespace MiniMes.Client.ViewModels
         }
 
         // [6. 조건 체크] 버튼을 누를 수 있는 상태인지 검사합니다. (true면 버튼 활성화, false면 비활성화)
-        private bool CanExcuteViewResultsCommand() => SelectedWorkOrder != null; // 항목을 골라야 조회 가능
+        private bool CanExcuteViewResultsCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Complete; // 항목을 골라야 조회 가능
         private bool CanExecuteAddCommand() => true; // 등록은 언제나 가능
         private bool CanExecuteEditOrDeleteCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Wait; // '대기' 상태만 수정/삭제 가능
         private bool CanRegExecuteEditOrDeleteCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Processing; // '진행중'일 때만 실적 등록 가능

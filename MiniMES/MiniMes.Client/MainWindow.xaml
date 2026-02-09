@@ -1,12 +1,19 @@
 ﻿<Window x:Class="MiniMes.Client.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MiniMes.Client"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Mini MES System" Height="600" Width="1000">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
+        <StackPanel Grid.Column="0" Background="#F0F0F0">
+            <TextBlock Text="Mini MES" FontSize="20" Margin="10" HorizontalAlignment="Center"/>
+            <Button Content="작업 지시 관리" Margin="5" Height="40" Click="OnOpenWorkOrderClick"/>
+            <Button Content="재고 관리(미구현)" Margin="5" Height="40"/>
+        </StackPanel>
+
+        <ContentControl x:Name="MainContent" Grid.Column="1" Margin="10"/>
     </Grid>
 </Window>
