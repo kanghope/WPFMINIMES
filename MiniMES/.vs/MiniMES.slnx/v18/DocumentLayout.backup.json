@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "D:\\WPFMINIMES\\MiniMES\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\themes\\generic.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|solutionrelative:minimes.client\\themes\\generic.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\views\\workresultlistview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|solutionrelative:minimes.client\\views\\workresultlistview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\views\\workorderlistview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|solutionrelative:minimes.client\\views\\workorderlistview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\themes\\generic.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|solutionrelative:minimes.client\\themes\\generic.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\views\\workordereditview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -82,7 +82,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -153,7 +153,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "Generic.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Themes\\Generic.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\Themes\\Generic.xaml",
@@ -178,7 +178,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "WorkResultListView.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkResultListView.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkResultListView.xaml",
@@ -281,7 +281,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "WorkOrderListView.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderListView.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkOrderListView.xaml",
