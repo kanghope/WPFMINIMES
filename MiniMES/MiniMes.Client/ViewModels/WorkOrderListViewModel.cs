@@ -8,6 +8,7 @@ using MiniMes.Infrastructure.Services;
 using System;
 using System.Collections.ObjectModel; // UI와 실시간으로 연동되는 리스트를 쓰기 위함
 using System.ComponentModel;          // "데이터 바뀌었으니 화면 새로 그려!"라고 알려주는 기능
+using System.ComponentModel.Design;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;         // 비동기(딴짓하면서 일하기)를 위한 도구
@@ -97,9 +98,14 @@ namespace MiniMes.Client.ViewModels
             RegisterResultCommand = new RelayCommand(async () => await ExecuteRegisterResultCommandAsync(), CanRegExecuteEditOrDeleteCommand);
             ViewResultsCommand = new RelayCommand(async () => await ExecuteViewResultsCommnad(), CanExcuteViewResultsCommand);
 
+            // [추가] 디자인 모드(Visual Studio 디자이너 화면)라면 여기서 중단!
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
             // 화면이 켜지자마자 데이터를 한 번 불러옵니다.
+            //if (!isDesigner)
+            //{
             _ = ExecuteLoadCommandAsync();//비동기 함수(async Task)를 호출할 때, 이 함수가 끝날 때까지 기다리지 않고
-                                          //**"결과는 나중에 알아서 나오겠지, 일단 난 내 할 일 하러 갈게"**라고 선언하는 것입니다.
+                                              //**"결과는 나중에 알아서 나오겠지, 일단 난 내 할 일 하러 갈게"**라고 선언하는 것입니다.
+            //}
         }
 
         // [6. 조건 체크] 버튼을 누를 수 있는 상태인지 검사합니다. (true면 버튼 활성화, false면 비활성화)
