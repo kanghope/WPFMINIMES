@@ -16,7 +16,8 @@
                 <ResourceDictionary Source="../Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            
             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MetroTextBoxStyle}">
                 <Setter Property="FontSize" Value="11"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -24,16 +25,32 @@
         </ResourceDictionary>
 
     </UserControl.Resources>
-    <Grid>
+    <Grid Cursor="">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="0" 
+        <Border Grid.Row="0" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1" Padding="15,7">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="📊 생산 현황 요약:" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StatisticsSummary}" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#555555"/>
+            </StackPanel>
+        </Border>
+        <DataGrid Grid.Row="1" 
+                  Sorting="DataGrid_Sorting" 
                   Style="{StaticResource MetroDataGridStyle}"
                   ItemsSource="{Binding WorkOrders}" 
                   SelectedItem="{Binding SelectedWorkOrder}" 
-                  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
+                  
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  VirtualizingStackPanel.CacheLengthUnit="Item"
+                  VirtualizingStackPanel.CacheLength="10,10"
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True"
+                  >
             <DataGrid.Columns>
                 <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="지시 ID" Binding="{Binding Id}" Width="80"/>
                 <DataGridTextColumn   Header="품목 코드"  Binding="{Binding ItemCode}" Width="*">
@@ -61,54 +78,31 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-
-            <Button Content="새로 고침" 
-                    Command="{Binding LoadCommand}" 
-                    Margin="5"
-                    MinWidth="70" 
-                    Cursor="Hand"
-                    Style="{StaticResource MetroBlueButtonStyle}"
-                    />
-
-            <Button Content="지시 등록" Command="{Binding AddCommand}" 
-                    Margin="5" Height="30"  
-MinWidth="70" 
-Cursor="Hand"
-Style="{StaticResource MetroBlueButtonStyle}"/>
-
-            <Button Content="지시 수정" Command="{Binding EditCommand}" Margin="5"
-MinWidth="70" 
-Cursor="Hand"
-Style="{StaticResource MetroBlueButtonStyle}"/>
-
-            <Button Content="지시 삭제" Command="{Binding DeleteCommand}" Margin="5"
-MinWidth="70" 
-Cursor="Hand"
-Style="{StaticResource MetroBlueButtonStyle}"/>
-
-
-
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <Button Content="합계 계산" Command="{Binding CalculateStatsCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="새로 고침" Command="{Binding LoadCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="지시 등록" Command="{Binding AddCommand}" Margin="5" Height="30" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="지시 수정" Command="{Binding EditCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="지시 삭제" Command="{Binding DeleteCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
             <Separator Margin="10,0"/>
-
-            <Button Content="작업 시작" Command="{Binding StartWorkCommand}" Margin="5"
-MinWidth="70" 
-Cursor="Hand"
-Style="{StaticResource MetroBlueButtonStyle}"/>
-
-            <!--<Button Content="작업 완료" Command="{Binding CompleteWorkCommand}" Margin="5" Padding="10,5"/>-->
-
-            <Button Content="실적 등록/완료" Command="{Binding RegisterResultCommand}" Margin="5"
-MinWidth="120" 
-Cursor="Hand"
-Style="{StaticResource MetroBlueButtonStyle}"/>
-
-            <Button Content="실적 조회" Command="{Binding ViewResultsCommand}" Margin="5"
-MinWidth="70" 
-Cursor="Hand"
-Style="{StaticResource MetroBlueButtonStyle}" />
-
+            <Button Content="작업 시작" Command="{Binding StartWorkCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="실적 등록/완료" Command="{Binding RegisterResultCommand}" Margin="5" MinWidth="120" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="실적 조회" Command="{Binding ViewResultsCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}" />
         </StackPanel>
+
+        <Grid Grid.Row="0" Grid.RowSpan="3" Background="#AAFFFFFF" 
+              Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+            <Border Background="White" BorderBrush="#0078D7" BorderThickness="1" 
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Padding="30" CornerRadius="5">
+                <StackPanel>
+                    <ProgressBar IsIndeterminate="True" Width="250" Height="5" Foreground="#0078D7" Background="#EEEEEE"/>
+                    <TextBlock Text="대용량 데이터를 분석하고 있습니다..." 
+                               Margin="0,15,0,0" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#333333"/>
+                    <TextBlock Text="잠시만 기다려 주십시오." 
+                               FontSize="11" Margin="0,5,0,0" HorizontalAlignment="Center" Foreground="#888888"/>
+                </StackPanel>
+            </Border>
+        </Grid>
 
     </Grid>
 

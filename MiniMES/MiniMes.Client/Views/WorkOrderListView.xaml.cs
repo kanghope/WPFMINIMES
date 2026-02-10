@@ -82,5 +82,38 @@ namespace MiniMes.Client.Views
                                 MessageBoxImage.Information);
             }
         }
+
+        private async void DataGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            if (DataContext is WorkOrderListViewModel viewmodel)
+            {
+                if (viewmodel == null) return;
+
+                // 2. 로딩 표시 시작
+                viewmodel.IsLoading = true;
+                viewmodel.StatisticsSummary = "데이터 정렬 중...";
+
+                // 3. UI가 로딩바를 그릴 시간을 주기 위해 아주 잠깐 대기
+                await Task.Delay(10);
+
+                // 4. 실제 정렬은 Dispatcher를 통해 'Background' 우선순위로 실행
+                // 이렇게 하면 UI 스레드가 로딩 애니메이션을 먼저 보여줄 수 있습니다.
+                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        // 기본 정렬 로직 실행
+                        e.Handled = false;
+                    }
+                    finally 
+                    {
+                        // 5. 정렬 완료 후 로딩 표시 종료
+                        // 정렬 직후 통계도 다시 계산하면 좋습니다.
+                        viewmodel.IsLoading = false;
+                        viewmodel.StatisticsSummary = "정렬 완료";
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Background);
+            }
+        }
     }
 }

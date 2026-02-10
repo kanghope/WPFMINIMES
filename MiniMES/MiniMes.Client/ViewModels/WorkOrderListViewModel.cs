@@ -13,6 +13,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;         // 비동기(딴짓하면서 일하기)를 위한 도구
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;           // 버튼 클릭 같은 명령을 처리하기 위함
 
 
@@ -30,6 +31,9 @@ namespace MiniMes.Client.ViewModels
         private readonly IWorkOrderService _service;//
         //private readonly WorkResultService _WorkResultsService = new WorkResultService();
         private readonly IWorkResultService _WorkResultsService;
+
+        // [추가] 연속 클릭 시 이전 비동기 작업을 취소하기 위한 소스
+        private CancellationTokenSource? _loadCts;
 
         // [2. 데이터 저장소] 화면에 보여줄 실제 값들입니다.
 
@@ -58,6 +62,14 @@ namespace MiniMes.Client.ViewModels
             set { _isLoading = value; OnPropertyChanged(nameof(IsLoading)); }
         }
 
+        // [추가] 화면에 표시할 통계용 프로퍼티
+        private string _statisticsSummary = "통계 대기 중...";
+        public string StatisticsSummary
+        {
+            get => _statisticsSummary;
+            set { _statisticsSummary = value; OnPropertyChanged(nameof(StatisticsSummary)); }
+        }
+
         // [3. 버튼 명령] XAML의 버튼과 연결될 '리모컨 버튼'들입니다.
         public ICommand LoadCommand { get; }           // 새로고침
         public ICommand AddCommand { get; }            // 등록
@@ -67,6 +79,7 @@ namespace MiniMes.Client.ViewModels
         public ICommand CompleteWorkCommand { get; }   // 작업완료
         public ICommand RegisterResultCommand { get; } // 실적등록
         public ICommand ViewResultsCommand { get; }    // 실적조회
+        public ICommand CalculateStatsCommand { get; }  // [추가] 계산 명령
 
         // [4. 창 띄우기 이벤트] "창 좀 열어줘!"라고 화면(View)에 보내는 신호들입니다.
         public event Action<WorkResultRegisterViewModel, string>? OpenRegisterWindowRequested;
@@ -85,6 +98,11 @@ namespace MiniMes.Client.ViewModels
         {
             _WorkResultsService = WorkResultsService;
             _service = workOrderService;
+
+            // [보안] 컬렉션 동기화 활성화 (다른 스레드에서 WorkOrders를 건드려도 안전하게 함)
+            BindingOperations.EnableCollectionSynchronization(WorkOrders, new object());
+
+
             // 리모컨 버튼(Command)과 실제 행동(Method)을 연결해줍니다.
             // async/await는 "작업이 끝날 때까지 기다려줄게, 하지만 화면은 멈추지 마"라는 뜻입니다.
             LoadCommand = new RelayCommand(async () => await ExecuteLoadCommandAsync());
@@ -97,6 +115,8 @@ namespace MiniMes.Client.ViewModels
 
             RegisterResultCommand = new RelayCommand(async () => await ExecuteRegisterResultCommandAsync(), CanRegExecuteEditOrDeleteCommand);
             ViewResultsCommand = new RelayCommand(async () => await ExecuteViewResultsCommnad(), CanExcuteViewResultsCommand);
+            // 생성자 안에서 연결
+            CalculateStatsCommand = new RelayCommand(async () => await ExecuteCalculateStatsAsync());
 
             // [추가] 디자인 모드(Visual Studio 디자이너 화면)라면 여기서 중단!
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
@@ -118,22 +138,85 @@ namespace MiniMes.Client.ViewModels
 
         // [7. 실제 행동들] 버튼을 눌렀을 때 실행되는 비동기 로직입니다.
         // 데이터를 불러오는 로직
+        // [개선] 스레드 안전성과 취소 로직이 추가된 로드 명령
         private async Task ExecuteLoadCommandAsync()
         {
-            if (IsLoading) return;
-            IsLoading = true;
+            // 1. 이전 작업이 수행 중이면 취소 신호를 보냅니다.
+            _loadCts?.Cancel();
+            _loadCts = new CancellationTokenSource();
+            var token = _loadCts.Token;
+
+            if (IsLoading) return;// 이미 로딩 중이면 중복 방지 (안전장치)
+            
+            IsLoading = true;// 로딩 시작 (XAML의 오버레이가 나타남)
+            StatisticsSummary = "데이터를 불러오는 중...";
             try
             {
                 // DB에서 데이터를 가져오는 동안 UI가 멈추지 않도록 비동기 호출
                 var data = await _service.GetAllWorkOrdersAsync();
 
+                //작업이 취소되었는지 중간에 체크
+                if (token.IsCancellationRequested) return;
+
                 // ObservableCollection은 UI 스레드에서 갱신해야 하지만, 
                 // await 이후에는 자동으로 UI 스레드로 복귀하므로 바로 작성 가능합니다.
                 WorkOrders.Clear();
+
+                /*
                 foreach (var item in data)
                 {
+                    // 수만 건일 경우를 대비해 취소 체크를 루프 안에서도 수행 가능
+                    if (token.IsCancellationRequested) break;
                     WorkOrders.Add(item);
                 }
+                // 3. [Task.Run 활용] CPU 작업: 10만 건 통계 계산을 백그라운드에서 실행
+                // 이 과정 동안 ProgressBar 애니메이션은 멈추지 않고 부드럽게 돌아갑니다.
+                StatisticsSummary = "분석 연산 중...";
+                
+                string statsResult = await Task.Run(() =>
+                {
+                    //실제 무거운 연산(10만건 루프)
+                    var total = data.Sum(x => x.Quantity);
+                    var complete = data.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
+                    //의도적인 부하 테스트를 위해 복잡한 가공이 들어가는 곳입니다.
+                    return $"총 지시수량: {total:N0} | 완료 건수:{complete:N0}건";
+                }, token);
+                StatisticsSummary = statsResult; // 계산 완료 후 UI 반영
+                */
+
+    
+                var dataList = data.ToList();
+
+                // 2. [병렬 처리] 데이터 추가와 통계 연산을 동시에 시작합니다.
+                // 통계 연산 작업 시작 (결과는 나중에 await로 받음)
+                var statsTask = Task.Run(() =>
+                {
+                    var total = dataList.Sum(x => x.Quantity);
+                    var complete = dataList.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
+                    return $"총 지시수량: {total:N0} | 완료 건수: {complete:N0}건";
+                }, token);
+
+                // 3. UI 리스트 채우기 (Batch 처리)
+                int batchSize = 1000;
+                for (int i = 0; i < dataList.Count; i += batchSize)
+                {
+                    // 중요: 루프 마다 취소되었는지 확인!
+                    if (token.IsCancellationRequested) return;
+
+                    var batch = dataList.Skip(i).Take(batchSize).ToList();
+
+                    await App.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        foreach (var item in batch) WorkOrders.Add(item);
+                    }), System.Windows.Threading.DispatcherPriority.Background);
+
+                    StatisticsSummary = $"{i + batch.Count:N0}건 로드 중...";
+                    await Task.Delay(1); // UI 스레드에게 숨 쉴 틈 제공
+                }
+
+                // 4. 리스트 추가가 끝나면 미리 돌려놨던 통계 결과를 가져와 표시
+                StatisticsSummary = await statsTask;
+
             }
             catch (Exception ex)
             {
@@ -198,6 +281,7 @@ namespace MiniMes.Client.ViewModels
             }
         }
         //작업지시 등록
+        // [참고] 버튼 클릭 이벤트에서 async Task를 사용할 때의 주의사항
         private async Task ExecuteStartWorkCommandAsync()
         {
             if (SelectedWorkOrder == null) return;
@@ -258,6 +342,41 @@ namespace MiniMes.Client.ViewModels
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private async Task ExecuteCalculateStatsAsync()
+        {
+            if (WorkOrders.Count == 0) return;
+
+            IsLoading = true;
+            StatisticsSummary = "계산 중...";
+
+            try
+            {
+                // 핵심: 10만 건의 데이터를 분석하는 무거운 작업은 Task.Run으로 백그라운드 팀에 맡깁니다.
+                var result = await Task.Run(() =>
+                {
+                    // 이 안은 UI 스레드가 아니므로 마음껏 CPU를 써도 화면이 멈추지 않습니다.
+                    var totalQty = WorkOrders.Sum(x => x.Quantity);
+                    var waitCount = WorkOrders.Count(x => x.StatusEnum == WorkOrderStatus.Wait);
+                    var processingCount = WorkOrders.Count(x => x.StatusEnum == WorkOrderStatus.Processing);
+                    var completeCount = WorkOrders.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
+
+                    return $"총 수량: {totalQty:N0} | 대기: {waitCount}건, 진행: {processingCount}건, 완료: {completeCount}건";
+                });
+
+                // await 이후에는 다시 UI 스레드로 돌아오므로 안전하게 프로퍼티를 갱신합니다.
+                StatisticsSummary = result;
+            }
+            catch (Exception ex)
+            {
+                StatisticsSummary = "계산 오류";
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 }
