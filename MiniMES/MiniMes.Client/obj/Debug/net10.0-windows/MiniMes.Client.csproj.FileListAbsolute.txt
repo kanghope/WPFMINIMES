@@ -77,7 +77,6 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderLi
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkResultListView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkResultRegisterView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\App.g.cs
-D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client_MarkupCompile.cache
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client_MarkupCompile.lref
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderListView.baml

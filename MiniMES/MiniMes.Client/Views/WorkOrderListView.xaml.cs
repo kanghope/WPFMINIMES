@@ -98,6 +98,7 @@ namespace MiniMes.Client.Views
 
                 // 4. 실제 정렬은 Dispatcher를 통해 'Background' 우선순위로 실행
                 // 이렇게 하면 UI 스레드가 로딩 애니메이션을 먼저 보여줄 수 있습니다.
+                //invoke 기다렸다가 실행 begininvoke 바로 시작안기다림
                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try

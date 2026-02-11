@@ -17,23 +17,31 @@ namespace MiniMes.Infrastructure.Services
         // ---------------------------------------------------------------------
         // 1. 모든 작업지시 목록 가져오기 (창고 뒤져서 다 보여주기)
         // ---------------------------------------------------------------------
-        public async Task<List<WorkOrderDto>> GetAllWorkOrdersAsync()
+        public async Task<List<WorkOrderDto>> GetAllWorkOrdersAsync(string strWoStatus)
         {
             // using: DB 연결 상자를 열고, 작업이 끝나면 자동으로 안전하게 닫습니다.
             using (var context = new MesDbContext())
             {
                 // DB에서 필요한 정보들만 쏙쏙 골라내서 가져옵니다 (Select).
                 // ToListAsync: "데이터가 많을 수 있으니 다 가져올 때까지 기다려줄게"라는 뜻입니다.
-                var entities = await context.WorkOrders.Select(e => new
+                // 1. 일단 쿼리의 시작점을 만듭니다 (아직 DB로 명령이 전달되지 않음)
+                var strQuery = context.WorkOrders.AsQueryable();
+
+                if(strWoStatus != "ALL")
                 {
-                    e.WO_ID,
-                    e.ITEM_CODE,
-                    e.WO_QTY,
-                    e.WO_STATUS,
-                    e.WO_DATE,
-                    e.UPDATED_AT,
-                    e.CREATED_AT
-                }).ToListAsync();
+                    strQuery = strQuery.Where(e => e.WO_STATUS == strWoStatus);
+                }
+                var entities = await strQuery
+                    .Select(e => new
+                    {
+                        e.WO_ID,
+                        e.ITEM_CODE,
+                        e.WO_QTY,
+                        e.WO_STATUS,
+                        e.WO_DATE,
+                        e.UPDATED_AT,
+                        e.CREATED_AT
+                    }).ToListAsync();
 
                 // DB에서 꺼낸 원본 데이터(Entity)를 화면에 보여주기 좋은 형태(Dto)로 예쁘게 포장해서 돌려줍니다.
                 return entities.Select(e => new WorkOrderDto

@@ -12,6 +12,13 @@ namespace MiniMes.Domain.Commons
         Cancel      // 취소 (컴퓨터는 3로 기억)
     }
 
+    //콤보박스 key value값 데이터 모델
+    public class StatusItem
+    {
+        public string DisplayName { get; set; } // 화면에 보여줄 글자 (Text)
+        public string StatusCode { get; set; }  // 내부적으로 처리할 값 (Value)
+    }
+
     // [2. 통역 도구함] 
     // 영어 이름표를 DB용 기호로 바꾸거나, 반대로 바꾸는 기능을 모아둔 곳입니다.
     public static class WorkOrderStatusExtensions
@@ -56,5 +63,7 @@ namespace MiniMes.Domain.Commons
                     return WorkOrderStatus.Wait;
             }
         }
+
+        
     }
 }

@@ -15,7 +15,7 @@ namespace MiniMes.Infrastructure.Interfaces
         // [1. 전체 목록 가져오기]
         // DB에 있는 모든 작업 지시서를 리스트 형태로 가져옵니다. 
         // Task<>는 비동기 작업(작업 중에도 화면이 멈추지 않음)을 의미합니다.
-        Task<List<WorkOrderDto>> GetAllWorkOrdersAsync();
+        Task<List<WorkOrderDto>> GetAllWorkOrdersAsync(string strWoStatus);
 
         // [2. 새 작업 등록하기]
         // 화면에서 입력한 정보를 바구니(dto)에 담아 전달하면 DB에 저장합니다.
