@@ -9,7 +9,7 @@ using MiniMes.Infrastructure.Services; // WorkResultService 참조
 
 namespace MiniMes.Client.ViewModels
 {
-    public class WorkResultRegisterViewModel : INotifyPropertyChanged
+    public class WorkResultRegisterViewModel : BaseViewModel
 
     {
 
@@ -179,13 +179,13 @@ namespace MiniMes.Client.ViewModels
         // ---------------------------------------------------
 
         // 속성 값이 바뀔 때 UI에 "너도 바뀌어야 해!"라고 소리치는 이벤트입니다.
-        public event PropertyChangedEventHandler? PropertyChanged;
+        //public event PropertyChangedEventHandler? PropertyChanged;
 
-        // 이 함수가 호출되면 WPF의 데이터 바인딩 시스템이 해당 이름의 UI 요소를 다시 그립니다.
-        protected void OnPropertyChanged(string propertyName)
-        {
-            // 구독자(UI)가 있을 때만 이벤트를 발생시킵니다.
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        //// 이 함수가 호출되면 WPF의 데이터 바인딩 시스템이 해당 이름의 UI 요소를 다시 그립니다.
+        //protected void OnPropertyChanged(string propertyName)
+        //{
+        //    // 구독자(UI)가 있을 때만 이벤트를 발생시킵니다.
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}
     }
 }

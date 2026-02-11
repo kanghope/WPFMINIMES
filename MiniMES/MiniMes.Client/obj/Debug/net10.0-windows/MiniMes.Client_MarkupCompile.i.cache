@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\WPFMINIMES\MiniMES\MiniMes.Client\App.xaml
-6-113947262
+7206950029
 
-151342957623
+1822536254
 214-1872510684
-MainWindow.xaml;Themes\Generic.xaml;Views\WorkOrderEditView.xaml;Views\WorkOrderListView.xaml;Views\WorkResultListView.xaml;Views\WorkResultRegisterView.xaml;
+MainWindow.xaml;Themes\Generic.xaml;Views\LoginView.xaml;Views\WorkOrderEditView.xaml;Views\WorkOrderListView.xaml;Views\WorkResultListView.xaml;Views\WorkResultRegisterView.xaml;
 
 True
 

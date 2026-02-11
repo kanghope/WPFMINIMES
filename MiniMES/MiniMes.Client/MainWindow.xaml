@@ -16,11 +16,26 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" Background="#F0F0F0">
-            <TextBlock Text="Mini MES" FontSize="20" Margin="10" HorizontalAlignment="Center"/>
-            <Button Style="{StaticResource MetroBlueButtonStyle}" Content="작업 지시 관리" Margin="5" Height="40" Click="OnOpenWorkOrderClick"/>
-            <Button Style="{StaticResource MetroBlueButtonStyle}" Content="재고 관리(미구현)" Margin="5" Height="40"/>
-        </StackPanel>
+        <DockPanel Grid.Column="0" Background="#F0F0F0">
+            <StackPanel DockPanel.Dock="Top" VerticalAlignment="Bottom" Margin="10">
+                <Separator Margin="0,10" Background="#DDD"/>
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <Ellipse Width="10" Height="10" Fill="LimeGreen" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock x:Name="TxtUserRole" Text="관리자" FontSize="11" Foreground="#666" FontWeight="Bold"/>
+                </StackPanel>
+                <TextBlock x:Name="TxtUserName" Text="홍길동 님" FontSize="13" Margin="23,0,0,5" Foreground="#333"/>
+                <Button Content="로그아웃" Click="OnLogoutClick" Height="25" Margin="5" Background="Transparent" BorderBrush="#CCC" FontSize="11"/>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="top">
+                <TextBlock Text="Mini MES" FontSize="20" Margin="10" HorizontalAlignment="Center" Foreground="#333" FontWeight="Bold"/>
+                <Button Style="{StaticResource MetroBlueButtonStyle}" Content="작업 지시 관리" Margin="5" Height="40" Click="OnOpenWorkOrderClick"/>
+                <Button Style="{StaticResource MetroBlueButtonStyle}" Content="재고 관리(미구현)" Margin="5" Height="40"/>
+            </StackPanel>
+
+            
+
+            <Grid />
+        </DockPanel>
 
         <ContentControl x:Name="MainContent" Grid.Column="1" Margin="10"/>
     </Grid>

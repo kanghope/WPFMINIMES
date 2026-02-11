@@ -1,0 +1,60 @@
+﻿<Window x:Class="MiniMes.Client.Views.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Mini MES - Login" Height="350" Width="400"
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize" 
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        Background="Transparent">
+
+    <Border Background="White" CornerRadius="15" BorderBrush="#DCDCDC" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="15" Direction="0" ShadowDepth="0" Opacity="0.2"/>
+        </Border.Effect>
+
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="Mini MES System" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                <TextBlock Text="관리자 계정으로 로그인하세요" FontSize="12" Foreground="#7F8C8D" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                <TextBlock Text="ID" FontSize="11" FontWeight="Bold" Foreground="#34495E" Margin="5,0,0,2"/>
+                <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="35" Margin="0,0,0,15" Padding="10,0"
+                         VerticalContentAlignment="Center" Background="#F9F9F9" BorderBrush="#E0E0E0"/>
+
+                <TextBlock Text="Password" FontSize="11" FontWeight="Bold" Foreground="#34495E" Margin="5,0,0,2"/>
+                <PasswordBox x:Name="PbPassword" Height="35" Padding="10,0"
+                             VerticalContentAlignment="Center" Background="#F9F9F9" BorderBrush="#E0E0E0"
+                             PasswordChanged="PasswordBox_PasswordChanged"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Margin="0,20,0,0">
+                <Button Content="LOGIN" 
+                        Command="{Binding LoginCommand}"
+                        IsDefault="True"
+                        Height="40" Background="#2980B9" Foreground="White" FontWeight="Bold" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="종료" Click="BtnClose_Click" Background="Transparent" BorderThickness="0" 
+                        Foreground="#95A5A6" Margin="0,10,0,0" Cursor="Hand"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

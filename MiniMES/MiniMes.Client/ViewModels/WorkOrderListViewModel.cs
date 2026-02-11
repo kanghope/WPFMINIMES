@@ -21,7 +21,7 @@ namespace MiniMes.Client.ViewModels
 {
     
     // INotifyPropertyChanged: "내 데이터가 바뀌면 화면에 알려주겠다"는 약속입니다.
-    public class WorkOrderListViewModel : INotifyPropertyChanged
+    public class WorkOrderListViewModel : BaseViewModel
     {
         /*1. 왜 실무에서는 직접 new를 하지 않을까요?
         부품 갈아끼우기 편리함: 나중에 Oracle DB에서 MySQL로 바꾸거나, 진짜 PLC 대신 가상 PLC 서비스로 바꾸고 싶을 때, 모든 코드를 고칠 필요 없이 Program.cs에서 딱 한 줄만 수정하면 됩니다.
@@ -259,7 +259,7 @@ namespace MiniMes.Client.ViewModels
                     }), System.Windows.Threading.DispatcherPriority.Background);
 
                     StatisticsSummary = $"{i + batch.Count:N0}건 로드 중...";
-                    await Task.Delay(1); // UI 스레드에게 숨 쉴 틈 제공
+                    await Task.Delay(5); // UI 스레드에게 숨 쉴 틈 제공
                 }
 
                 // 4. 리스트 추가가 끝나면 미리 돌려놨던 통계 결과를 가져와 표시
@@ -513,11 +513,11 @@ namespace MiniMes.Client.ViewModels
         }
 
         // 8. Property Changed Implementation
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        //public event PropertyChangedEventHandler? PropertyChanged;
+        //protected void OnPropertyChanged(string propertyName)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}
 
         private async Task ExecuteCalculateStatsAsync()
         {

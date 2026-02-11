@@ -43,6 +43,8 @@
     <Compile Include="Commons\WorkOrderStatus.cs" />
     <Compile Include="DTOs\WorkOrderDto.cs" />
     <Compile Include="DTOs\WorkResultDto.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\UserEntity.cs" />
     <Compile Include="Entities\WorkOrderEntity.cs" />
     <Compile Include="Entities\WorkResultEntity.cs" />
   </ItemGroup>

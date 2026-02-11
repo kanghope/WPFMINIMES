@@ -13,7 +13,7 @@ namespace MiniMes.Client.ViewModels
     /// 이 클래스는 사용자가 팝업창에서 글자를 입력할 때, 그 값이 올바른지 체크하고
     /// 최종적으로 '저장'을 누르기 전까지 데이터를 임시로 붙잡고 있는 역할을 합니다.
     /// </summary>
-    public class WorkOrderEditViewModel : INotifyPropertyChanged
+    public class WorkOrderEditViewModel : BaseViewModel
     {
         // ---------------------------------------------------------------------
         // 1. 내부 저장소 (필드)
@@ -164,13 +164,13 @@ namespace MiniMes.Client.ViewModels
         // ---------------------------------------------------------------------
         // 6. 알림 인터페이스 (WPF의 핵심)
         // ---------------------------------------------------------------------
-        public event PropertyChangedEventHandler? PropertyChanged;
+        //public event PropertyChangedEventHandler? PropertyChanged;
 
-        // 프로퍼티의 값이 바뀌었을 때 화면(XAML)에 "야! 데이터 바뀌었으니까 다시 그려!"라고 
-        // 신호를 보내는 확성기 같은 메서드입니다.
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        //// 프로퍼티의 값이 바뀌었을 때 화면(XAML)에 "야! 데이터 바뀌었으니까 다시 그려!"라고 
+        //// 신호를 보내는 확성기 같은 메서드입니다.
+        //protected void OnPropertyChanged(string propertyName)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}
     }
 }

@@ -15,7 +15,7 @@ namespace MiniMes.Client.ViewModels
 
     // 특정 작업 지시에 대한 실적 목록을 관리하는 ViewModel
 
-    public class WorkResultListViewModel : INotifyPropertyChanged
+    public class WorkResultListViewModel : BaseViewModel
 
     {
 
@@ -137,15 +137,15 @@ namespace MiniMes.Client.ViewModels
 
         // ---------------------------------------------------------------------
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string propertyName)
+        //protected void OnPropertyChanged(string propertyName)
 
-        {
+        //{
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        }
+        //}
 
     }
 
