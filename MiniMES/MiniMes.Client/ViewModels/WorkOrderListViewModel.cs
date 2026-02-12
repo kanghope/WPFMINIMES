@@ -239,7 +239,7 @@ namespace MiniMes.Client.ViewModels
                 Background (4)백그라운드지금 우리가 쓴 것. 화면 다 그리고 남는 시간에 해!
                 ApplicationIdle (2)한가할 때프로그램이 정말 아무것도 안 하고 놀 때 해!
                  */
-                int batchSize = 1000;
+                int batchSize = 3000;
                 for (int i = 0; i < dataList.Count; i += batchSize)//1 씩증가가 아닌 한번루프 돌때마다 1000개씩 증가
                 {
                     // 중요: 루프 마다 취소되었는지 확인!
