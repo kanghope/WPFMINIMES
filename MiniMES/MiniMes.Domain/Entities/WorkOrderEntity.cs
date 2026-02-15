@@ -28,6 +28,11 @@ namespace MiniMes.Domain.Entities
         [MaxLength(10)]
         public string WO_STATUS { get; set; }
 
+        // --- 추가된 실무 컬럼 ---
+        public string EQ_CODE { get; set; }     // 작업을 수행 중인 설비 코드
+        public int COMPLETE_QTY { get; set; }   // 실시간 누적 양품 수량
+        // -----------------------
+
         // [5. 자동 생성 값] 데이터가 들어갈 때 DB가 자동으로 시간을 찍어주는 컬럼입니다.
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime CREATED_AT { get; set; } // 생성 일시

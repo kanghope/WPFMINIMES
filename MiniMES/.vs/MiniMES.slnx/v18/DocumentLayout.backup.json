@@ -284,9 +284,9 @@
               "Title": "WorkOrderListViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs",
-              "ToolTip": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs*",
-              "RelativeToolTip": "MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs*",
-              "ViewState": "AgIAAN4AAAAAAAAAAAAAwOsAAAA0AAAAAAAAAA==",
+              "ToolTip": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs",
+              "RelativeToolTip": "MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs",
+              "ViewState": "AgIAAMsAAAAAAAAAAAAAANMAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-10T12:39:59.912Z",
               "EditorCaption": ""
@@ -301,8 +301,7 @@
               "RelativeToolTip": "MiniMes.Client\\Views\\WorkResultRegisterView.xaml.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAAAqwA8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-11T12:48:50.425Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-11T12:48:50.425Z"
             },
             {
               "$type": "Document",
@@ -492,7 +491,8 @@
               "RelativeToolTip": "MiniMES.Infastructure\\MiniMES.Infastructure.csproj",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-02-11T12:50:24.088Z"
+              "WhenOpened": "2026-02-11T12:50:24.088Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",

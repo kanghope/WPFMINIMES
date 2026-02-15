@@ -20,6 +20,10 @@ namespace MiniMes.Domain.Entities
         public int GOOD_QTY { get; set; } // 잘 만든 개수 (양품)
         public int BAD_QTY { get; set; }  // 못 만든 개수 (불량)
 
+        public string EQ_CODE { get; set; }
+
+        public int RAW_LOG_ID { get; set; }  // 
+
         public DateTime RESULT_DATE { get; set; } // 실적을 등록한 날짜와 시간
 
         // [4. 내 부모님(지시서) 찾아가기]
