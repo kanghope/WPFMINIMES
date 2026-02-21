@@ -100,11 +100,18 @@
             <Button Content="지시 수정" Command="{Binding EditCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
             <Button Content="지시 삭제" Command="{Binding DeleteCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
             <Separator Margin="10,0"/>
-            <Button Content="작업 시작" Command="{Binding StartWorkCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
+            <!--Button Content="작업 시작" Command="{Binding StartWorkCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/-->
+            <Button Content="작업 시작(PLC)" Command="{Binding StartCommand}" 
+                    Margin="5" MinWidth="100" FontWeight="Bold" Background="#27AE60" Foreground="White"
+                    Style="{StaticResource MetroBlueButtonStyle}"/>
+
+            <Button Content="작업 종료(PLC)" Command="{Binding StopCommand}" 
+                    Margin="5" MinWidth="100" FontWeight="Bold" Background="#C0392B" Foreground="White"
+                    Style="{StaticResource MetroBlueButtonStyle}"/>
             <Button Content="실적 등록/완료" Command="{Binding RegisterResultCommand}" Margin="5" MinWidth="120" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
             <Button Content="실적 조회" Command="{Binding ViewResultsCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}" />
         </StackPanel>
-        <Grid Grid.Row="0" Grid.RowSpan="3" Background="#AAFFFFFF" 
+        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#AAFFFFFF" 
       Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
 
             <Border Background="White" BorderBrush="#0078D7" BorderThickness="1" 
@@ -115,7 +122,7 @@
                 </Border.Effect>
 
                 <StackPanel Width="300">
-                    <TextBlock Text="데이터 분석 및 로딩 중" FontSize="16" FontWeight="Bold" 
+                    <TextBlock Text="데이터 처리 및 통신 준비 중" FontSize="16" FontWeight="Bold" 
                        Foreground="#333333" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
                     <ProgressBar Value="{Binding LoadingProgress}" 

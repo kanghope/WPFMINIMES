@@ -1,19 +1,31 @@
 ﻿using MiniMes.Domain.Commons;
 using MiniMes.Domain.DTOs;
 using MiniMes.Domain.Entities;
+using MiniMes.Infrastructure.Data;
 using MiniMes.Infrastructure.Interfaces;
+using MiniMES.Infastructure.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks; // 비동기(기다려주기) 기능을 위해 꼭 필요해요!
-using MiniMes.Infrastructure.Data;
 
 namespace MiniMes.Infrastructure.Services
 {
     // 이 클래스는 작업지시(주문)를 DB에 넣고, 빼고, 고치는 '창고지기'입니다.
     public class WorkOrderService : IWorkOrderService
     {
+        private readonly IWorkOrderRepository _workOrderRepository;
+
+        // 생성자 주입 (DI) 설정
+        public WorkOrderService(IWorkOrderRepository workOrderRepository)
+        {
+            _workOrderRepository = workOrderRepository;
+        }
+
+        // 기본 생성자 (필요 시 보존)
+        public WorkOrderService() { }
+
         // ---------------------------------------------------------------------
         // 1. 모든 작업지시 목록 가져오기 (창고 뒤져서 다 보여주기)
         // ---------------------------------------------------------------------
@@ -144,6 +156,35 @@ namespace MiniMes.Infrastructure.Services
                     await context.SaveChangesAsync();
                 }
             }
+        }
+
+        // ---------------------------------------------------------------------
+        // 신규 기능: 작업 시작 (StartWorkOrder)
+        // ---------------------------------------------------------------------
+        public async Task StartWorkOrderAsync(int woId, string userId, string eqCode)
+        {
+            
+            // [신규 방식] Repository를 통해 SP_StartWorkOrder 호출 (설비 연동 및 트랜잭션 포함)
+            await _workOrderRepository.StartWorkOrder(woId, userId, eqCode);
+        }
+
+        // ---------------------------------------------------------------------
+        // 신규 기능: 작업 종료 (StopWorkOrder)
+        // ---------------------------------------------------------------------
+        public async Task StopWorkOrderAsync(int woId, string userId)
+        {
+            /* [기존 방식 - 주석 처리]
+            using (var context = new MesDbContext()) {
+                var entity = await context.WorkOrders.SingleOrDefaultAsync(e => e.WO_ID == woId);
+                if (entity != null) {
+                    entity.WO_STATUS = "C";
+                    await context.SaveChangesAsync();
+                }
+            }
+            */
+
+            // [신규 방식] Repository를 통해 SP_StopWorkOrder 호출 (최종 실적 정산 및 상태 마감)
+            await _workOrderRepository.StopWorkOrder(woId, userId);
         }
     }
 }

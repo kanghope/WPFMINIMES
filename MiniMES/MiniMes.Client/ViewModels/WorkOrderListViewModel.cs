@@ -5,6 +5,9 @@ using MiniMes.Domain.Commons;
 using MiniMes.Domain.DTOs;
 using MiniMes.Infrastructure.Interfaces;
 using MiniMes.Infrastructure.Services;
+using MiniMES.Infastructure.interfaces;
+using MiniMES.Infastructure.Services;
+using MiniMES.Infrastructure.Auth;
 using System;
 using System.Collections.ObjectModel; // UI와 실시간으로 연동되는 리스트를 쓰기 위함
 using System.ComponentModel;          // "데이터 바뀌었으니 화면 새로 그려!"라고 알려주는 기능
@@ -32,6 +35,10 @@ namespace MiniMes.Client.ViewModels
         private readonly IWorkOrderService _service;//
         //private readonly WorkResultService _WorkResultsService = new WorkResultService();
         private readonly IWorkResultService _WorkResultsService;
+
+        private readonly IWorkOrderRepository _workOrderRepository;
+
+        private readonly SerialDeviceService _serialDeviceService;
 
         // [추가] 연속 클릭 시 이전 비동기 작업을 취소하기 위한 소스
         private CancellationTokenSource? _loadCts;
@@ -122,6 +129,11 @@ namespace MiniMes.Client.ViewModels
         public ICommand DeleteCommand { get; }         // 삭제
         public ICommand StartWorkCommand { get; }      // 작업시작
         public ICommand CompleteWorkCommand { get; }   // 작업완료
+
+        // [명령 선언]
+        public ICommand StartCommand { get; }// 작업시작
+        public ICommand StopCommand { get; }// 작업완료
+
         public ICommand RegisterResultCommand { get; } // 실적등록
         public ICommand ViewResultsCommand { get; }    // 실적조회
         public ICommand CalculateStatsCommand { get; }  // [추가] 계산 명령
@@ -132,17 +144,52 @@ namespace MiniMes.Client.ViewModels
         public event Action<WorkResultListViewModel, string>? OpenResultWindowRequested;
 
         // A. XAML 디자인 및 기본 생성을 위한 "빈 생성자" (추가)
-        public WorkOrderListViewModel() : this(new WorkOrderService(), new WorkResultService()) // 아래 B번 생성자를 호출하며 실제 객체를 전달
+        public WorkOrderListViewModel() : this(new WorkOrderService(), new WorkResultService(), new WorkOrderRepository(), new SerialDeviceService()) // 아래 B번 생성자를 호출하며 실제 객체를 전달
         {
             // 아무것도 적지 않아도 됩니다. (위의 : this(...)가 알아서 연결해줍니다.)
         }
 
         // [5. 생성자] 이 클래스가 태어날 때 가장 먼저 실행되는 곳입니다.
         // B. 실제 프로그램 실행 및 테스트를 위한 "기존 생성자" (유지)
-        public WorkOrderListViewModel(IWorkOrderService workOrderService, IWorkResultService WorkResultsService)
+        public WorkOrderListViewModel(IWorkOrderService workOrderService, IWorkResultService WorkResultsService, IWorkOrderRepository WorkOrderRepository, SerialDeviceService SerialDeviceService)
         {
             _WorkResultsService = WorkResultsService;
             _service = workOrderService;
+            _workOrderRepository = WorkOrderRepository;
+            _serialDeviceService = SerialDeviceService ?? throw new ArgumentNullException(nameof(SerialDeviceService));
+
+            // 시리얼 서비스에서 데이터 수신 시 자동 새로고침 연결
+            _serialDeviceService.OnRefreshRequired += () => {
+                App.Current.Dispatcher.InvokeAsync(async () => await ExecuteLoadCommandAsync());
+            };
+
+            // [추가] 설비 가동 시작 신호 수신 시 로직
+            _serialDeviceService.OnDeviceStarted += (eqCode) =>
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    // 통계바나 상태 표시줄에 메시지 출력
+                    StatisticsSummary = $"▶ 설비 상태: {eqCode} 가동 중 (신호 수신 완료)";
+
+                    // 필요하다면 작은 팝업이나 알림바를 띄울 수 있습니다.
+                     MessageBox.Show($"{eqCode} 설비가 정상적으로 가동되었습니다.");
+                });
+            };
+
+            // [추가] 설비에서 "END" 전문이 오면 실행될 로직 연결
+            _serialDeviceService.OnWorkFinishedByDevice += (eqCode) =>
+            {
+                // UI 스레드에서 안전하게 종료 메서드 호출
+                App.Current.Dispatcher.Invoke(async () =>
+                {
+                    // 현재 선택된 작업이 해당 설비의 작업인지 확인 후 종료 처리
+                    if (SelectedWorkOrder != null)
+                    {
+                        await ExecuteStopWork();
+                        MessageBox.Show($"설비({eqCode})로부터 종료 신호를 수신하여 작업을 자동 마감합니다.");
+                    }
+                });
+            };
 
             //목록초기화
             StatusOptions = new ObservableCollection<StatusItem>
@@ -174,6 +221,9 @@ namespace MiniMes.Client.ViewModels
             ViewResultsCommand = new RelayCommand(async () => await ExecuteViewResultsCommnad(), CanExcuteViewResultsCommand);
             // 생성자 안에서 연결
             CalculateStatsCommand = new RelayCommand(async () => await ExecuteCalculateStatsAsync());
+            //작업시작, 작업종료 (plc연동 추가부분)
+            StartCommand = new RelayCommand(async () => await ExecuteStartWork(), () => CanExecuteStart());
+            StopCommand = new RelayCommand(async () => await ExecuteStopWork(), () => CanExecuteStop());
 
             // [추가] 디자인 모드(Visual Studio 디자이너 화면)라면 여기서 중단!
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
@@ -198,17 +248,21 @@ namespace MiniMes.Client.ViewModels
         // [개선] 스레드 안전성과 취소 로직이 추가된 로드 명령
         private async Task ExecuteLoadCommandAsync()
         {
-            // 1. 이전 작업이 수행 중이면 취소 신호를 보냅니다.
+            // [수정] 1. 이미 로딩 중이라면 중복 실행 방지 (가장 먼저 체크)
+            if (_isLoading) return;
+
+            // 2. 취소 토큰 설정
             _loadCts?.Cancel();
             _loadCts = new CancellationTokenSource();
             var token = _loadCts.Token;
 
-            if (IsLoading) return;// 이미 로딩 중이면 중복 방지 (안전장치)
+
             
-            IsLoading = true;// 로딩 시작 (XAML의 오버레이가 나타남)
-            StatisticsSummary = "데이터를 불러오는 중...";
             try
             {
+                IsLoading = true;// 로딩 시작 (XAML의 오버레이가 나타남)
+                StatisticsSummary = "데이터를 불러오는 중...";
+
                 // DB에서 데이터를 가져오는 동안 UI가 멈추지 않도록 비동기 호출a
                 var data = await _service.GetAllWorkOrdersAsync(SelectedStatusCode);
 
@@ -239,7 +293,7 @@ namespace MiniMes.Client.ViewModels
                 Background (4)백그라운드지금 우리가 쓴 것. 화면 다 그리고 남는 시간에 해!
                 ApplicationIdle (2)한가할 때프로그램이 정말 아무것도 안 하고 놀 때 해!
                  */
-                int batchSize = 3000;
+                int batchSize = 2000;
                 for (int i = 0; i < dataList.Count; i += batchSize)//1 씩증가가 아닌 한번루프 돌때마다 1000개씩 증가
                 {
                     // 중요: 루프 마다 취소되었는지 확인!
@@ -259,7 +313,7 @@ namespace MiniMes.Client.ViewModels
                     }), System.Windows.Threading.DispatcherPriority.Background);
 
                     StatisticsSummary = $"{i + batch.Count:N0}건 로드 중...";
-                    await Task.Delay(5); // UI 스레드에게 숨 쉴 틈 제공
+                    await Task.Delay(1); // UI 스레드에게 숨 쉴 틈 제공
                 }
 
                 // 4. 리스트 추가가 끝나면 미리 돌려놨던 통계 결과를 가져와 표시
@@ -399,7 +453,7 @@ namespace MiniMes.Client.ViewModels
             }
             finally
             {
-                IsLoading = false;
+                IsLoading = false;// 반드시 false로 돌려주어 로딩바를 제거
             }
         }
 
@@ -518,6 +572,88 @@ namespace MiniMes.Client.ViewModels
         //{
         //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         //}
+
+        // ---------------------------------------------------------------------
+        // 신규 로직: 작업 시작 실행
+        // ---------------------------------------------------------------------
+        private async Task ExecuteStartWork()
+        {
+            if (SelectedWorkOrder == null || IsLoading) return; // 로딩 중이면 차단
+
+            try
+            {
+                IsLoading = true; // 로딩 시작
+                                  // 1. DB 상태 변경 (대기 -> 진행)
+                await _workOrderRepository.StartWorkOrder(SelectedWorkOrder.Id, UserSession.UserId, "EQ01");
+
+                // 2. PLC 통신 시작 (이때 포트를 엽니다)
+                // _serialService는 주입받은 객체
+                // [보완] 포트 이름을 설정에서 가져오거나 체크
+                _serialDeviceService.Open("COM1");
+
+                // 3. (옵션) PLC에게 시작 신호를 보내야 한다면
+                // _serialService.SendMessage("START_ORDER");
+
+                // --- 수정 포인트: 재조회 전 로딩 플래그 해제 ---
+                // ExecuteLoadCommandAsync 내부에도 IsLoading을 true로 만드는 로직이 있으므로,
+                // 여기서 미리 풀어주어야 return되지 않고 정상 실행됩니다.
+                IsLoading = false;
+                // 3. 목록 새로고침 (여기서 다시 IsLoading이 true가 되었다가 작업 후 false가 됨)
+                await ExecuteLoadCommandAsync();
+
+                // [추가] 버튼 상태 즉시 반영
+                CommandManager.InvalidateRequerySuggested();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"설비 연결 실패: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false; // 로딩 종료
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 신규 로직: 작업 종료 실행
+        // ---------------------------------------------------------------------
+        private async Task ExecuteStopWork()
+        {
+            // 1. 사전 체크: 선택된 지시가 없거나 이미 로딩 중이면 종료
+            if (SelectedWorkOrder == null || IsLoading) return;
+
+            try
+            {
+                IsLoading = true; // [추가] 작업 시작 즉시 로딩 표시 및 버튼 잠금
+
+                // 2. DB 마감 처리 (상태를 'C' 또는 종료로 변경)
+                await _workOrderRepository.StopWorkOrder(SelectedWorkOrder.Id, UserSession.UserId);
+
+                // 3. PLC 통신 종료
+                // 주의: Dispose 후 다시 시작할 때 객체가 null이 되지 않도록 관리 필요
+                _serialDeviceService.Dispose();
+
+                // 4. 목록 새로고침 (변경된 상태 반영)
+                await ExecuteLoadCommandAsync();
+
+                // [추가] 버튼 상태 즉시 반영
+                CommandManager.InvalidateRequerySuggested();
+
+                MessageBox.Show("작업이 정상적으로 종료되고 통신이 해제되었습니다.", "종료 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"설비 연결 종료 중 오류 발생: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false; // 작업 완료 후 잠금 해제
+            }
+        }
+
+        // 버튼 활성화 조건 (대기 중일 때만 시작 가능, 진행 중일 때만 종료 가능)
+        private bool CanExecuteStart() => SelectedWorkOrder?.Status == "W";
+        private bool CanExecuteStop() => SelectedWorkOrder?.Status == "P";
 
         private async Task ExecuteCalculateStatsAsync()
         {

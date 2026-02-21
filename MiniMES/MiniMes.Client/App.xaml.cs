@@ -2,6 +2,7 @@
 using MiniMes.Client.ViewModels;
 using MiniMes.Infrastructure.Interfaces;
 using MiniMes.Infrastructure.Services;
+using MiniMES.Infastructure.interfaces;
 using MiniMES.Infastructure.Services;
 using MiniMES.Infrastructure.Auth;
 using System;
@@ -31,6 +32,19 @@ namespace MiniMes.Client
             services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<IWorkOrderService, WorkOrderService>();
             services.AddSingleton<IWorkResultService, WorkResultServicePro>();
+            // 1. 먼저 Repository를 등록해야 합니다. (IWorkOrderRepository 구현체가 무엇인지 확인)
+            services.AddSingleton<IWorkOrderRepository, WorkOrderRepository>();
+            // ★ [추가] SerialDeviceService 등록 ★
+            // 이 서비스는 통신 포트를 하나만 점유해야 하므로 반드시 Singleton으로 등록합니다.
+            // 2. 그 다음 SerialDeviceService를 등록합니다.
+            services.AddSingleton<SerialDeviceService>(sp =>
+            {
+         
+                // ★ 컨테이너(sp)에서 이미 등록된 Repository를 꺼내옵니다.
+                var repo = sp.GetRequiredService<IWorkOrderRepository>();
+
+                return new SerialDeviceService(repo);
+            });
 
             // 2. ViewModel 등록
             services.AddTransient<LoginViewModel>();
