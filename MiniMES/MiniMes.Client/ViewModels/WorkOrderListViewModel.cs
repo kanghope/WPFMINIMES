@@ -18,7 +18,7 @@ using System.Threading.Tasks;         // 비동기(딴짓하면서 일하기)를
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;           // 버튼 클릭 같은 명령을 처리하기 위함
-
+using System.Windows.Media;
 
 namespace MiniMes.Client.ViewModels
 {
@@ -56,6 +56,21 @@ namespace MiniMes.Client.ViewModels
             get => _workOrders;
             set { _workOrders = value; OnPropertyChanged(nameof(WorkOrders)); }
         }
+
+        // [실시간 모니터링] 통신 로그 및 상태 프로퍼티
+        public ObservableCollection<string> CommunicationLogs { get; } = new ObservableCollection<string>();
+
+        private string _deviceStatusText = "연결 대기 중";
+        public string DeviceStatusText { get => _deviceStatusText; set { _deviceStatusText = value; OnPropertyChanged(nameof(DeviceStatusText)); } }
+
+        private Brush _deviceStatusColor = Brushes.Gray;
+        public Brush DeviceStatusColor { get => _deviceStatusColor; set { _deviceStatusColor = value; OnPropertyChanged(nameof(DeviceStatusColor)); } }
+
+        private string _lastSignalTime = "-";
+        public string LastSignalTime { get => _lastSignalTime; set { _lastSignalTime = value; OnPropertyChanged(nameof(LastSignalTime)); } }
+
+        private int _packetCount = 0;
+        public int PacketCount { get => _packetCount; set { _packetCount = value; OnPropertyChanged(nameof(PacketCount)); } }
 
         //진행중 콤보박스 리스트(객체목록)
         public ObservableCollection<StatusItem> StatusOptions { get; set; } = new ObservableCollection<StatusItem>
@@ -121,7 +136,14 @@ namespace MiniMes.Client.ViewModels
             get => _LoadingProgress;
             set { _LoadingProgress = value; OnPropertyChanged(nameof(LoadingProgress)); }
         }
-        
+        //작업시작시 진행중일경우에는 값이 변경되지않도록
+        private bool _flagYn;
+        public bool FlagYn
+        {
+            get => _flagYn;
+            set { _flagYn = value; OnPropertyChanged(nameof(FlagYn)); }
+        } 
+
         // [3. 버튼 명령] XAML의 버튼과 연결될 '리모컨 버튼'들입니다.
         public ICommand LoadCommand { get; }           // 새로고침
         public ICommand AddCommand { get; }            // 등록
@@ -157,9 +179,28 @@ namespace MiniMes.Client.ViewModels
             _service = workOrderService;
             _workOrderRepository = WorkOrderRepository;
             _serialDeviceService = SerialDeviceService ?? throw new ArgumentNullException(nameof(SerialDeviceService));
+            FlagYn = true; //초기값 true
+
+            // [추가] PLC 서비스 이벤트 구독 (실시간 데이터 수신 시 UI 갱신)
+            _serialDeviceService.OnDataReceived += (data) => {
+                App.Current.Dispatcher.Invoke(() => {
+                    AddLog($"RX: {data}"); // 로그 추가
+                    PacketCount++;         // 패킷 수 증가
+                    LastSignalTime = DateTime.Now.ToString("HH:mm:ss.fff");
+                });
+            };
+
+            _serialDeviceService.OnDeviceStarted += (eqCode) => {
+                App.Current.Dispatcher.Invoke(() => {
+                    DeviceStatusText = $"{eqCode} 연결됨";
+                    DeviceStatusColor = Brushes.LimeGreen; // 상태 표시등 녹색
+                    AddLog($"SYSTEM: {eqCode} 설비와 통신이 시작되었습니다.");
+                });
+            };
 
             // 시리얼 서비스에서 데이터 수신 시 자동 새로고침 연결
-            _serialDeviceService.OnRefreshRequired += () => {
+            _serialDeviceService.OnRefreshRequired += (flag) => {
+                 FlagYn = flag;
                 App.Current.Dispatcher.InvokeAsync(async () => await ExecuteLoadCommandAsync());
             };
 
@@ -260,192 +301,194 @@ namespace MiniMes.Client.ViewModels
             
             try
             {
-                IsLoading = true;// 로딩 시작 (XAML의 오버레이가 나타남)
-                StatisticsSummary = "데이터를 불러오는 중...";
-
-                // DB에서 데이터를 가져오는 동안 UI가 멈추지 않도록 비동기 호출a
-                var data = await _service.GetAllWorkOrdersAsync(SelectedStatusCode);
-
-                var dataList = data.ToList();
-                double totalCount = dataList.Count; // 전체 개수 파악
-
-                //작업이 취소되었는지 중간에 체크
-                if (token.IsCancellationRequested) return;
-
-                // ObservableCollection은 UI 스레드에서 갱신해야 하지만, 
-                // await 이후에는 자동으로 UI 스레드로 복귀하므로 바로 작성 가능합니다.
-                WorkOrders.Clear();
-                LoadingProgress = 0;//시작 전 0% 초기화
-
-                var statsTask = Task.Run(() =>
+                if (FlagYn == true)
                 {
-                    var total = dataList.Sum(x => x.Quantity);
-                    var complete = dataList.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
-                    return $"총 지시수량: {total:N0} | 완료 건수: {complete:N0}건";
-                }, token);
+                    IsLoading = true;// 로딩 시작 (XAML의 오버레이가 나타남)
+                    StatisticsSummary = "데이터를 불러오는 중...";
 
-                // 3. UI 리스트 채우기 (Batch 처리)
-                /*
-                 등급 (Priority)의미설명
-                Send (10)최우선당장 멈추고 이 일부터 해! (거의 안 씀)
-                Normal (9)보통일반적인 버튼 클릭 처리 등 (기본값)
-                Render (7)화면 그리기ProgressBar 애니메이션, 레이아웃 재계산 등
-                Background (4)백그라운드지금 우리가 쓴 것. 화면 다 그리고 남는 시간에 해!
-                ApplicationIdle (2)한가할 때프로그램이 정말 아무것도 안 하고 놀 때 해!
-                 */
-                int batchSize = 2000;
-                for (int i = 0; i < dataList.Count; i += batchSize)//1 씩증가가 아닌 한번루프 돌때마다 1000개씩 증가
-                {
-                    // 중요: 루프 마다 취소되었는지 확인!
+                    // DB에서 데이터를 가져오는 동안 UI가 멈추지 않도록 비동기 호출a
+                    var data = await _service.GetAllWorkOrdersAsync(SelectedStatusCode);
+
+                    var dataList = data.ToList();
+                    double totalCount = dataList.Count; // 전체 개수 파악
+
+                    //작업이 취소되었는지 중간에 체크
                     if (token.IsCancellationRequested) return;
 
-                    var batch = dataList.Skip(i).Take(batchSize).ToList();//i번째 만큼 건너뛰고 1000개씩 가져온다. 
+                    // ObservableCollection은 UI 스레드에서 갱신해야 하지만, 
+                    // await 이후에는 자동으로 UI 스레드로 복귀하므로 바로 작성 가능합니다.
+                    WorkOrders.Clear();
+                    LoadingProgress = 0;//시작 전 0% 초기화
 
-                    await App.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    var statsTask = Task.Run(() =>
                     {
-                        foreach (var item in batch) WorkOrders.Add(item);
-                        // 퍼센트 계산: (현재까지 쌓인 양 / 전체 양) * 100
-                        if (totalCount > 0) 
+                        var total = dataList.Sum(x => x.Quantity);
+                        var complete = dataList.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
+                        return $"총 지시수량: {total:N0} | 완료 건수: {complete:N0}건";
+                    }, token);
+
+                    // 3. UI 리스트 채우기 (Batch 처리)
+                    /*
+                     등급 (Priority)의미설명
+                    Send (10)최우선당장 멈추고 이 일부터 해! (거의 안 씀)
+                    Normal (9)보통일반적인 버튼 클릭 처리 등 (기본값)
+                    Render (7)화면 그리기ProgressBar 애니메이션, 레이아웃 재계산 등
+                    Background (4)백그라운드지금 우리가 쓴 것. 화면 다 그리고 남는 시간에 해!
+                    ApplicationIdle (2)한가할 때프로그램이 정말 아무것도 안 하고 놀 때 해!
+                     */
+                    int batchSize = 2000;
+                    for (int i = 0; i < dataList.Count; i += batchSize)//1 씩증가가 아닌 한번루프 돌때마다 1000개씩 증가
+                    {
+                        // 중요: 루프 마다 취소되었는지 확인!
+                        if (token.IsCancellationRequested) return;
+
+                        var batch = dataList.Skip(i).Take(batchSize).ToList();//i번째 만큼 건너뛰고 1000개씩 가져온다. 
+
+                        await App.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            LoadingProgress = ((double)(i + batch.Count) / totalCount) * 100;
-                        }
+                            foreach (var item in batch) WorkOrders.Add(item);
+                            // 퍼센트 계산: (현재까지 쌓인 양 / 전체 양) * 100
+                            if (totalCount > 0)
+                            {
+                                LoadingProgress = ((double)(i + batch.Count) / totalCount) * 100;
+                            }
 
-                    }), System.Windows.Threading.DispatcherPriority.Background);
+                        }), System.Windows.Threading.DispatcherPriority.Background);
 
-                    StatisticsSummary = $"{i + batch.Count:N0}건 로드 중...";
-                    await Task.Delay(1); // UI 스레드에게 숨 쉴 틈 제공
-                }
-
-                // 4. 리스트 추가가 끝나면 미리 돌려놨던 통계 결과를 가져와 표시
-                StatisticsSummary = await statsTask;
-                LoadingProgress = 100;//완료시 100
-
-
-                /*
-                foreach (var item in data)
-                {
-                    // 수만 건일 경우를 대비해 취소 체크를 루프 안에서도 수행 가능
-                    if (token.IsCancellationRequested) break;
-                    WorkOrders.Add(item);
-                }
-                // 3. [Task.Run 활용] CPU 작업: 10만 건 통계 계산을 백그라운드에서 실행
-                // 이 과정 동안 ProgressBar 애니메이션은 멈추지 않고 부드럽게 돌아갑니다.
-                StatisticsSummary = "분석 연산 중...";
-                
-                string statsResult = await Task.Run(() =>
-                {
-                    //실제 무거운 연산(10만건 루프)
-                    var total = data.Sum(x => x.Quantity);
-                    var complete = data.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
-                    //의도적인 부하 테스트를 위해 복잡한 가공이 들어가는 곳입니다.
-                    return $"총 지시수량: {total:N0} | 완료 건수:{complete:N0}건";
-                }, token);
-                StatisticsSummary = statsResult; // 계산 완료 후 UI 반영
-                */
-
-
-
-                // 2. [병렬 처리] 데이터 추가와 통계 연산을 동시에 시작합니다.
-                // 통계 연산 작업 시작 (결과는 나중에 await로 받음)
-                //Task.Run을 사용하는 핵심적인 이유는 딱 한 문장으로 요약됩니다:
-                //**"무거운 짐을 UI 스레드에서 떼어내어, 힘센 일꾼(백그라운드 스레드)에게 맡기기 위해서"**입니다.
-                /*
-                 1. CPU 집약적인 작업 (CPU-Bound Tasks)
-                컴퓨터의 머리(CPU)가 아주 바쁘게 연산해야 하는 경우입니다. 현재 하신 **'10만 건 데이터 합계 계산'**이 여기에 해당합니다.
-                복잡한 수학 계산: 통계 분석, 암호화/복복호화.
-                이미지/비디오 처리: 사진 필터 적용, 이미지 리사이징.
-                대량의 텍스트 분석: 수만 줄의 로그 파일에서 특정 패턴 찾기.
-                이유: 이런 일을 UI 스레드가 직접 하면, 계산하는 동안 마우스 클릭도 안 먹히고 화면이 멈추기 때문입니다.
-
-                2. 동기(Sync) 메서드를 비동기처럼 쓰고 싶을 때
-                우리가 사용하는 외부 라이브러리 중에는 async가 지원되지 않는 옛날 방식들이 있습니다.
-                예시: Library.DoHeavyJob() 처럼 시간이 오래 걸리는데 Task를 반환하지 않는 경우.
-                C#
-                // 이렇게 감싸면 동기 메서드도 비동기처럼 호출 가능합니다.
-                await Task.Run(() => _oldService.OldHeavyMethod());
-                이유: 내가 직접 코드를 고칠 수 없는 외부 도구를 쓰면서도 UI가 멈추는 것을 방지하기 위해서입니다.
-                
-                3. I/O 작업이지만 응답이 너무 느릴 때
-                일반적으로 DB 조회나 웹 API 호출은 await _service.GetAsync()처럼 전용 비동기 메서드를 쓰는 게 정석입니다. 하지만 다음과 같은 특수한 경우가 있습니다.
-                로컬 파일 대량 읽기/쓰기: 하드디스크 속도가 느려 윈도우 메세지 처리에 영향을 줄 때.
-                복합 작업: 데이터를 가져오자마자(I/O) 바로 복잡하게 가공(CPU)해야 하는 세트 작업.
-
-                4. 병렬 처리 (Parallelism)
-                여러 개의 일을 동시에 처리해서 전체 시간을 단축하고 싶을 때 사용합니다.
-                예시: 1번 공정 데이터, 2번 공정 데이터, 3번 공정 데이터를 각각 다른 스레드에서 동시에 불러와서 합칠 때.
-
-                1. 여러 공정 데이터 동시 조회 (속도 향상)
-                만약 '작업 지시', '재고 현황', '불량 내역' 3가지 데이터를 각각 불러와야 한다면, 하나씩 기다리는 것(await)보다 동시에 던지는(Task.Run) 것이 훨씬 빠릅니다.
-                일반 방식: 1초 + 1초 + 1초 = 3초 소요
-                병렬 방식: 1초, 1초, 1초 동시 시작 = 최대 1초 소요
-                C#
-                public async Task LoadDashboardDataAsync()
-                {
-                    IsLoading = true;
-
-                    // 3개의 작업을 동시에 시작합니다.
-                    var orderTask = _orderService.GetAllOrdersAsync();      // 작업지시 조회
-                    var stockTask = _stockService.GetCurrentStockAsync();   // 재고 조회
-                    var defectTask = _defectService.GetDefectLogsAsync();   // 불량 로그 조회
-
-                    // Task.WhenAll을 사용하여 세 작업이 모두 끝날 때까지 기다립니다.
-                    await Task.WhenAll(orderTask, stockTask, defectTask);
-
-                    // 결과물들을 한 번에 UI에 반영
-                    Orders = new ObservableCollection<OrderDto>(await orderTask);
-                    Stocks = new ObservableCollection<StockDto>(await stockTask);
-                    Defects = new ObservableCollection<DefectDto>(await defectTask);
-
-                    IsLoading = false;
-                }
-                2. 대량 데이터 병렬 계산 (Parallel.ForEach)
-                10만 건의 작업 지시 데이터를 분석하여, 각 항목마다 복잡한 '예상 완료 시간'을 계산해야 한다고 가정해 봅시다. 
-                foreach 문을 하나씩 돌리는 대신, CPU의 여러 코어를 동시에 사용하여 계산합니다.
-
-                C#
-                public async Task CalculateEstimatedTimesAsync()
-                {
-                    var data = WorkOrders.ToList();
-
-                    await Task.Run(() =>
-                    {
-                        // Parallel.ForEach가 CPU 코어를 나눠서 병렬로 계산합니다.
-                        Parallel.ForEach(data, item =>
-                        {
-                            // 아주 복잡하고 무거운 연산 (예: 설비 가동률 기반 시뮬레이션)
-                            item.EstimatedTime = ComplexCalculation(item);
-                        });
-                    });
-    
-                    MessageBox.Show("모든 데이터의 예상 시간이 계산되었습니다.");
-                }
-                3. 실시간 설비 모니터링 (개별 백그라운드 루프)
-                MES에서 여러 대의 설비(PLC)로부터 데이터를 받아올 때, 메인 UI 스레드에서 하나씩 체크하면 화면이 버벅입니다. 각 설비마다 별도의 Task를 할당하여 병렬로 감시합니다.
-
-                C#
-                public void StartMonitoring()
-                {
-                    // 설비 A와 설비 B를 각각 별도의 일꾼(Task)이 감시하게 함
-                    Task.Run(() => MonitorMachine("Machine_A"));
-                    Task.Run(() => MonitorMachine("Machine_B"));
-                }
-
-                private async Task MonitorMachine(string machineId)
-                {
-                    while (true)
-                    {
-                        var status = await _plcService.ReadStatusAsync(machineId);
-        
-                        // UI 스레드에 상태 보고
-                        App.Current.Dispatcher.Invoke(() => {
-                            UpdateMachineUI(machineId, status);
-                        });
-
-                        await Task.Delay(500); // 0.5초마다 체크
+                        StatisticsSummary = $"{i + batch.Count:N0}건 로드 중...";
+                        await Task.Delay(1); // UI 스레드에게 숨 쉴 틈 제공
                     }
-                }
-                 */
 
+                    // 4. 리스트 추가가 끝나면 미리 돌려놨던 통계 결과를 가져와 표시
+                    StatisticsSummary = await statsTask;
+                    LoadingProgress = 100;//완료시 100
+
+
+                    /*
+                    foreach (var item in data)
+                    {
+                        // 수만 건일 경우를 대비해 취소 체크를 루프 안에서도 수행 가능
+                        if (token.IsCancellationRequested) break;
+                        WorkOrders.Add(item);
+                    }
+                    // 3. [Task.Run 활용] CPU 작업: 10만 건 통계 계산을 백그라운드에서 실행
+                    // 이 과정 동안 ProgressBar 애니메이션은 멈추지 않고 부드럽게 돌아갑니다.
+                    StatisticsSummary = "분석 연산 중...";
+
+                    string statsResult = await Task.Run(() =>
+                    {
+                        //실제 무거운 연산(10만건 루프)
+                        var total = data.Sum(x => x.Quantity);
+                        var complete = data.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
+                        //의도적인 부하 테스트를 위해 복잡한 가공이 들어가는 곳입니다.
+                        return $"총 지시수량: {total:N0} | 완료 건수:{complete:N0}건";
+                    }, token);
+                    StatisticsSummary = statsResult; // 계산 완료 후 UI 반영
+                    */
+
+
+
+                    // 2. [병렬 처리] 데이터 추가와 통계 연산을 동시에 시작합니다.
+                    // 통계 연산 작업 시작 (결과는 나중에 await로 받음)
+                    //Task.Run을 사용하는 핵심적인 이유는 딱 한 문장으로 요약됩니다:
+                    //**"무거운 짐을 UI 스레드에서 떼어내어, 힘센 일꾼(백그라운드 스레드)에게 맡기기 위해서"**입니다.
+                    /*
+                     1. CPU 집약적인 작업 (CPU-Bound Tasks)
+                    컴퓨터의 머리(CPU)가 아주 바쁘게 연산해야 하는 경우입니다. 현재 하신 **'10만 건 데이터 합계 계산'**이 여기에 해당합니다.
+                    복잡한 수학 계산: 통계 분석, 암호화/복복호화.
+                    이미지/비디오 처리: 사진 필터 적용, 이미지 리사이징.
+                    대량의 텍스트 분석: 수만 줄의 로그 파일에서 특정 패턴 찾기.
+                    이유: 이런 일을 UI 스레드가 직접 하면, 계산하는 동안 마우스 클릭도 안 먹히고 화면이 멈추기 때문입니다.
+
+                    2. 동기(Sync) 메서드를 비동기처럼 쓰고 싶을 때
+                    우리가 사용하는 외부 라이브러리 중에는 async가 지원되지 않는 옛날 방식들이 있습니다.
+                    예시: Library.DoHeavyJob() 처럼 시간이 오래 걸리는데 Task를 반환하지 않는 경우.
+                    C#
+                    // 이렇게 감싸면 동기 메서드도 비동기처럼 호출 가능합니다.
+                    await Task.Run(() => _oldService.OldHeavyMethod());
+                    이유: 내가 직접 코드를 고칠 수 없는 외부 도구를 쓰면서도 UI가 멈추는 것을 방지하기 위해서입니다.
+
+                    3. I/O 작업이지만 응답이 너무 느릴 때
+                    일반적으로 DB 조회나 웹 API 호출은 await _service.GetAsync()처럼 전용 비동기 메서드를 쓰는 게 정석입니다. 하지만 다음과 같은 특수한 경우가 있습니다.
+                    로컬 파일 대량 읽기/쓰기: 하드디스크 속도가 느려 윈도우 메세지 처리에 영향을 줄 때.
+                    복합 작업: 데이터를 가져오자마자(I/O) 바로 복잡하게 가공(CPU)해야 하는 세트 작업.
+
+                    4. 병렬 처리 (Parallelism)
+                    여러 개의 일을 동시에 처리해서 전체 시간을 단축하고 싶을 때 사용합니다.
+                    예시: 1번 공정 데이터, 2번 공정 데이터, 3번 공정 데이터를 각각 다른 스레드에서 동시에 불러와서 합칠 때.
+
+                    1. 여러 공정 데이터 동시 조회 (속도 향상)
+                    만약 '작업 지시', '재고 현황', '불량 내역' 3가지 데이터를 각각 불러와야 한다면, 하나씩 기다리는 것(await)보다 동시에 던지는(Task.Run) 것이 훨씬 빠릅니다.
+                    일반 방식: 1초 + 1초 + 1초 = 3초 소요
+                    병렬 방식: 1초, 1초, 1초 동시 시작 = 최대 1초 소요
+                    C#
+                    public async Task LoadDashboardDataAsync()
+                    {
+                        IsLoading = true;
+
+                        // 3개의 작업을 동시에 시작합니다.
+                        var orderTask = _orderService.GetAllOrdersAsync();      // 작업지시 조회
+                        var stockTask = _stockService.GetCurrentStockAsync();   // 재고 조회
+                        var defectTask = _defectService.GetDefectLogsAsync();   // 불량 로그 조회
+
+                        // Task.WhenAll을 사용하여 세 작업이 모두 끝날 때까지 기다립니다.
+                        await Task.WhenAll(orderTask, stockTask, defectTask);
+
+                        // 결과물들을 한 번에 UI에 반영
+                        Orders = new ObservableCollection<OrderDto>(await orderTask);
+                        Stocks = new ObservableCollection<StockDto>(await stockTask);
+                        Defects = new ObservableCollection<DefectDto>(await defectTask);
+
+                        IsLoading = false;
+                    }
+                    2. 대량 데이터 병렬 계산 (Parallel.ForEach)
+                    10만 건의 작업 지시 데이터를 분석하여, 각 항목마다 복잡한 '예상 완료 시간'을 계산해야 한다고 가정해 봅시다. 
+                    foreach 문을 하나씩 돌리는 대신, CPU의 여러 코어를 동시에 사용하여 계산합니다.
+
+                    C#
+                    public async Task CalculateEstimatedTimesAsync()
+                    {
+                        var data = WorkOrders.ToList();
+
+                        await Task.Run(() =>
+                        {
+                            // Parallel.ForEach가 CPU 코어를 나눠서 병렬로 계산합니다.
+                            Parallel.ForEach(data, item =>
+                            {
+                                // 아주 복잡하고 무거운 연산 (예: 설비 가동률 기반 시뮬레이션)
+                                item.EstimatedTime = ComplexCalculation(item);
+                            });
+                        });
+
+                        MessageBox.Show("모든 데이터의 예상 시간이 계산되었습니다.");
+                    }
+                    3. 실시간 설비 모니터링 (개별 백그라운드 루프)
+                    MES에서 여러 대의 설비(PLC)로부터 데이터를 받아올 때, 메인 UI 스레드에서 하나씩 체크하면 화면이 버벅입니다. 각 설비마다 별도의 Task를 할당하여 병렬로 감시합니다.
+
+                    C#
+                    public void StartMonitoring()
+                    {
+                        // 설비 A와 설비 B를 각각 별도의 일꾼(Task)이 감시하게 함
+                        Task.Run(() => MonitorMachine("Machine_A"));
+                        Task.Run(() => MonitorMachine("Machine_B"));
+                    }
+
+                    private async Task MonitorMachine(string machineId)
+                    {
+                        while (true)
+                        {
+                            var status = await _plcService.ReadStatusAsync(machineId);
+
+                            // UI 스레드에 상태 보고
+                            App.Current.Dispatcher.Invoke(() => {
+                                UpdateMachineUI(machineId, status);
+                            });
+
+                            await Task.Delay(500); // 0.5초마다 체크
+                        }
+                    }
+                     */
+                }
             }
             catch (Exception ex)
             {
@@ -603,6 +646,10 @@ namespace MiniMes.Client.ViewModels
 
                 // [추가] 버튼 상태 즉시 반영
                 CommandManager.InvalidateRequerySuggested();
+
+                // [추가] 실제 Serial 포트 오픈 및 모니터링 시작
+                //_serialDeviceService.Open("COM1");
+                AddLog("SYSTEM: COM1 포트 Open 시도...");
             }
             catch(Exception ex)
             {
@@ -632,6 +679,12 @@ namespace MiniMes.Client.ViewModels
                 // 3. PLC 통신 종료
                 // 주의: Dispose 후 다시 시작할 때 객체가 null이 되지 않도록 관리 필요
                 _serialDeviceService.Dispose();
+
+                DeviceStatusText = "통신 종료";
+                DeviceStatusColor = Brushes.Gray;
+                AddLog("SYSTEM: 통신 포트를 닫았습니다.");
+
+                IsLoading = false;
 
                 // 4. 목록 새로고침 (변경된 상태 반영)
                 await ExecuteLoadCommandAsync();
@@ -688,6 +741,13 @@ namespace MiniMes.Client.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        // [추가] 로그 메시지 관리 메서드 (최신 로그 100개 유지)
+        private void AddLog(string msg)
+        {
+            CommunicationLogs.Insert(0, $"[{DateTime.Now:HH:mm:ss}] {msg}");
+            if (CommunicationLogs.Count > 100) CommunicationLogs.RemoveAt(100);
         }
     }
 }

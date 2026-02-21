@@ -24,13 +24,19 @@ namespace MiniMES.Infastructure.Services
         private readonly IWorkOrderRepository? _repo;
 
         // 데이터가 처리되었을 때 UI(ViewModel)에 알리기 위한 이벤트
-        public event Action? OnRefreshRequired;
+        public event Action<bool>? OnRefreshRequired;
 
         // [추가] 설비가 가동 시작(START) 신호를 보냈을 때 발생할 이벤트
         public event Action<string>? OnDeviceStarted;
 
         // [추가] 설비로부터 종료 신호를 받았을 때 발생시킬 이벤트
         public event Action<string>? OnWorkFinishedByDevice;
+
+        // [추가] UI에 원본 데이터를 실시간으로 전달하기 위한 이벤트
+        // ViewModel에서 이 이벤트를 구독하여 리스트박스에 로그를 남깁니다.
+        public event Action<string>? OnDataReceived;
+
+
         public bool IsOpen => _port?.IsOpen ?? false;
         public SerialDeviceService()
         {
@@ -96,6 +102,9 @@ namespace MiniMES.Infastructure.Services
                     string data = sp.ReadLine().Trim(); // 여기서 \r\n을 기다림
                     if (!string.IsNullOrEmpty(data))
                     {
+                        // [핵심 추가] 수신된 원본 데이터를 구독자(ViewModel)에게 즉시 알림
+                        // 비동기로 처리하여 데이터 분석(HandleData)과 UI 로그 출력이 동시에 일어나게 합니다.
+                        OnDataReceived?.Invoke(data);
                         Task.Run(() => HandleData(data));
                     }
                 }
@@ -211,7 +220,7 @@ namespace MiniMES.Infastructure.Services
                 string currentUserId = !string.IsNullOrEmpty(MiniMES.Infrastructure.Auth.UserSession.UserId)
                                        ? UserSession.UserId
                                        : "SYSTEM";
-
+                string currentStatus = "";
                 using (var conn = new SqlConnection(_connStr))
                 {
                     await conn.OpenAsync(); // 비동기 연결 권장
@@ -226,11 +235,13 @@ namespace MiniMES.Infastructure.Services
                     // 2. Repository 호출 (await 추가)
                     if (_repo != null)
                     {
-                        await _repo.ProcessProduction(eqCode, logId, ok, ng, currentUserId);
+                        currentStatus = await _repo.ProcessProduction(eqCode, logId, ok, ng, currentUserId);
                     }
 
+                    bool flag = currentStatus == "C" ? true : false;
+                    
                     // 3. UI 갱신 (보통 ViewModel의 이벤트이므로 UI 스레드 동기화는 ViewModel에서 처리)
-                    OnRefreshRequired?.Invoke();
+                    OnRefreshRequired?.Invoke(flag);
                 }
             }
             catch (Exception ex)

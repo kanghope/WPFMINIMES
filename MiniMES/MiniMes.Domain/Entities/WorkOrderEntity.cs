@@ -30,7 +30,7 @@ namespace MiniMes.Domain.Entities
 
         // --- 추가된 실무 컬럼 ---
         public string EQ_CODE { get; set; }     // 작업을 수행 중인 설비 코드
-        public int COMPLETE_QTY { get; set; }   // 실시간 누적 양품 수량
+        public int? COMPLETE_QTY { get; set; } = 0;   // 실시간 누적 양품 수량 // 방법 2: 기본값을 0으로 강제 지정 (가장 권장됨)
         // -----------------------
 
         // [5. 자동 생성 값] 데이터가 들어갈 때 DB가 자동으로 시간을 찍어주는 컬럼입니다.

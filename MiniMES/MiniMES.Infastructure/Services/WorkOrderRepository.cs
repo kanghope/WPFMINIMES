@@ -90,7 +90,7 @@ namespace MiniMES.Infastructure.Services
         }
 
         // PLC 실적 처리 프로시저 호출 (기존 생성한 SP_ProcessDeviceProduction)
-        public async Task ProcessProduction(string eqCode, long logId, int goodQty, int badQty, string userId)
+        public async Task<string> ProcessProduction(string eqCode, long logId, int goodQty, int badQty, string userId)
         {
             using (var db = new SqlConnection(_connectionString))
             {
@@ -107,16 +107,18 @@ namespace MiniMES.Infastructure.Services
                             WorkerId = userId
                         };
 
-                    //await db.ExecuteAsync("SP_ProcessDeviceProduction",
-                    //                        param,
-                    //                        transaction: transaction,
-                    //                        commandType: CommandType.StoredProcedure);
-                    await db.ExecuteAsync("SP_ProcessDeviceProduction",
-                              param,
-                              commandType: CommandType.StoredProcedure);
-                    // [핵심] 성공적으로 실행되었다면 반드시 Commit을 호출해야 DB에 반영됩니다.
-                    //transaction.Commit();
-
+                        /*
+                        await db.ExecuteAsync("SP_ProcessDeviceProduction",
+                                  param,
+                                  commandType: CommandType.StoredProcedure);*/
+                        var currentStatus = await db.QueryFirstOrDefaultAsync<string>(
+                            "SP_ProcessDeviceProduction",
+                            param,
+                            commandType: CommandType.StoredProcedure
+                        );
+                        // [핵심] 성공적으로 실행되었다면 반드시 Commit을 호출해야 DB에 반영됩니다.
+                        //transaction.Commit();
+                        return currentStatus;
                     }
                     catch (Exception ex)
                     {

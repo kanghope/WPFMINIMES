@@ -8,6 +8,6 @@ namespace MiniMES.Infastructure.interfaces
     {
         Task StartWorkOrder(int woId, string userId, string eqCode);
         Task StopWorkOrder(int woId, string userId);
-        Task ProcessProduction(string eqCode, long logId, int goodQty, int badQty, string userId);
+        Task<string> ProcessProduction(string eqCode, long logId, int goodQty, int badQty, string userId);
     }
 }

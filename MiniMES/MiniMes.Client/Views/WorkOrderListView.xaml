@@ -31,8 +31,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="150"/>
         </Grid.RowDefinitions>
         <StackPanel Margin="10" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="조회건수 :" Margin="0,5,5,5"/>
+            <TextBox  />
             <TextBlock Text="상태 선택 :" Margin="0,5,5,5"/>
             <ComboBox ItemsSource="{Binding StatusOptions}" 
               SelectedValue="{Binding SelectedStatusCode}"
@@ -141,6 +144,36 @@
                 </StackPanel>
             </Border>
         </Grid>
+        <GroupBox Grid.Row="5" Header="📡 PLC 실시간 통신 로그" Margin="5" BorderBrush="#CCCCCC">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="220"/>
+                </Grid.ColumnDefinitions>
+
+                <ListBox Grid.Column="0" 
+                         ItemsSource="{Binding CommunicationLogs}" 
+                         Background="#1E1E1E" Foreground="#00FF00" 
+                         FontSize="11" FontFamily="Consolas" BorderThickness="0"/>
+
+                <Border Grid.Column="1" Background="#F8F9FA" BorderBrush="#DDDDDD" BorderThickness="1,0,0,0">
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Ellipse Width="12" Height="12" Fill="{Binding DeviceStatusColor}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding DeviceStatusText}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <Separator Margin="0,5"/>
+
+                        <TextBlock Text="마지막 수신 시간:" FontSize="10" Foreground="#666666"/>
+                        <TextBlock Text="{Binding LastSignalTime}" FontWeight="SemiBold" Margin="0,0,0,5"/>
+
+                        <TextBlock Text="누적 패킷량:" FontSize="10" Foreground="#666666"/>
+                        <TextBlock Text="{Binding PacketCount, StringFormat={}{0} 건}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </GroupBox>
         <!--
         <Grid Grid.Row="0" Grid.RowSpan="3" Background="#AAFFFFFF" 
               Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
@@ -157,5 +190,6 @@
         </Grid>
 -->
     </Grid>
+    
 
 </UserControl>
