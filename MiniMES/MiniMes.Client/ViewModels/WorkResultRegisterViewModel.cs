@@ -10,15 +10,7 @@ using MiniMes.Infrastructure.Services; // WorkResultService 참조
 namespace MiniMes.Client.ViewModels
 {
     public class WorkResultRegisterViewModel : BaseViewModel
-
     {
-
-        // [수정] 서비스를 인터페이스 타입으로 필드 선언
-
-        //private readonly IWorkOrderService _workOrderService;
-        //22222222222222222
-
-
         // [속성/필드 영역]
         // 실적을 저장할 때 사용할 실제 DB 서비스 객체입니다.
         // 실무에서는 생성자를 통해 주입(DI)받지만, 현재는 직접 생성을 통해 기능을 구현했습니다.
