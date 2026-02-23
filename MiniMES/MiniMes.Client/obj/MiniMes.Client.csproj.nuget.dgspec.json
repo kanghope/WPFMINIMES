@@ -54,6 +54,10 @@
         "net10.0-windows7.0": {
           "targetAlias": "net10.0-windows",
           "dependencies": {
+            "CSharpMarkup.WinUI.LiveChartsCore.SkiaSharpView": {
+              "target": "Package",
+              "version": "[3.1.2, )"
+            },
             "Dapper": {
               "target": "Package",
               "version": "[2.1.66, )"

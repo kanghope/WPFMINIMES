@@ -34,15 +34,34 @@
             <RowDefinition Height="150"/>
         </Grid.RowDefinitions>
         <StackPanel Margin="10" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Text="조회건수 :" Margin="0,5,5,5"/>
-            <TextBox  />
-            <TextBlock Text="상태 선택 :" Margin="0,5,5,5"/>
+            <TextBlock Text="조회 기간 :" VerticalAlignment="Center" Margin="10,0,5,0"/>
+            <DatePicker SelectedDate="{Binding StartDate}" Width="120" Height="25"/>
+            <TextBlock Text="~" VerticalAlignment="Center" Margin="5,0"/>
+            <DatePicker SelectedDate="{Binding EndDate}" Width="120" Height="25"/>
+
+            <TextBlock Text="상태 :" VerticalAlignment="Center" Margin="15,0,5,0"/>
             <ComboBox ItemsSource="{Binding StatusOptions}" 
               SelectedValue="{Binding SelectedStatusCode}"
               DisplayMemberPath="DisplayName"
               SelectedValuePath="StatusCode"
-              Width="100" Height="20"
-              SelectedIndex="0"/>
+              Width="100" Height="25"
+              VerticalContentAlignment="Center"/>
+
+            <TextBlock Text="검색어 :" VerticalAlignment="Center" Margin="15,0,5,0"/>
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+             Width="150" Height="25" 
+             Tag="품목코드 또는 ID 입력...">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding LoadCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <Button Content="🔍 조회" 
+            Command="{Binding LoadCommand}" 
+            Margin="10,0,0,0" 
+            Padding="10,0" 
+            Height="25"
+            Style="{StaticResource MetroBlueButtonStyle}"/>
         </StackPanel>
         <Border Grid.Row="1" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1" Padding="15,7">
             <StackPanel Orientation="Horizontal">
@@ -69,12 +88,23 @@
                 <DataGridTextColumn   Header="품목 코드"  Binding="{Binding ItemCode}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="left" />
+                            <Setter Property="HorizontalAlignment" Value="Center" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="지시 수량" Binding="{Binding Quantity}" Width="80"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="계획 수량" Binding="{Binding Quantity}" Width="80"/>
+                <DataGridTextColumn ElementStyle="{StaticResource CenterTextColumnStyle}" Header="실적 수량" Binding="{Binding CompleteQty}" Width="80"/>
+                <DataGridTemplateColumn Header="진행률" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5,2">
+                                <ProgressBar Value="{Binding ProgressValue, Mode=OneWay}" Minimum="0" Maximum="100" Height="14" Foreground="#4CAF50" Background="#E0E0E0"/>
+                                <TextBlock Text="{Binding ProgressValue, StringFormat={}{0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" FontWeight="Bold"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn  Header="상태" Binding="{Binding DisplayStatus}"  Width="80">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">

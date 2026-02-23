@@ -97,10 +97,10 @@ namespace MiniMes.Client.ViewModels
                     // [핵심] 값이 바뀌는 순간, 비동기로 조회를 시작합니다.
                     // _ = 는 결과를 기다리지 않고(Fire and Forget) 실행한다는 뜻입니다.
                     // _service가 주입되지 않았을 때는 실행하지 않도록 보호
-                    if (_service != null)
-                    {
-                        _ = ExecuteLoadCommandAsync();
-                    }
+                    //if (_service != null)
+                    //{
+                    //    _ = ExecuteLoadCommandAsync();
+                    //}
                 }
             }
         }
@@ -142,9 +142,33 @@ namespace MiniMes.Client.ViewModels
         {
             get => _flagYn;
             set { _flagYn = value; OnPropertyChanged(nameof(FlagYn)); }
-        } 
+        }
+
+        // 검색 기간 설정
+        private DateTime _startDate = DateTime.Now.AddDays(-30); // 기본 일주일 전
+        public DateTime StartDate
+        {
+            get => _startDate;
+            set { _startDate = value; OnPropertyChanged(nameof(StartDate)); }
+        }
+
+        private DateTime _endDate = DateTime.Now;
+        public DateTime EndDate
+        {
+            get => _endDate;
+            set { _endDate = value; OnPropertyChanged(nameof(EndDate)); }
+        }
+
+        // 검색어 (지시 ID나 품목코드)
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set { _searchText = value; OnPropertyChanged(nameof(SearchText)); }
+        }
 
         // [3. 버튼 명령] XAML의 버튼과 연결될 '리모컨 버튼'들입니다.
+        public ICommand SearchCommand { get; }         // 검색명령
         public ICommand LoadCommand { get; }           // 새로고침
         public ICommand AddCommand { get; }            // 등록
         public ICommand EditCommand { get; }           // 수정
@@ -200,7 +224,7 @@ namespace MiniMes.Client.ViewModels
 
             // 시리얼 서비스에서 데이터 수신 시 자동 새로고침 연결
             _serialDeviceService.OnRefreshRequired += (flag) => {
-                 FlagYn = flag;
+                 //FlagYn = flag;
                 App.Current.Dispatcher.InvokeAsync(async () => await ExecuteLoadCommandAsync());
             };
 
@@ -230,6 +254,24 @@ namespace MiniMes.Client.ViewModels
                         MessageBox.Show($"설비({eqCode})로부터 종료 신호를 수신하여 작업을 자동 마감합니다.");
                     }
                 });
+            };
+
+            // [추가] 통신 재연결 체크
+            _serialDeviceService.OnConnectionStatusChanged += (isConnected) =>
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                    System.Windows.Threading.DispatcherPriority.Background,
+                    new Action(() => {
+                        // 1. 상태 텍스트 변경
+                        DeviceStatusText = isConnected ? "🟢 설비 연결됨" : "🔴 연결 끊김 (재시도 중)";
+
+                        // 2. 색상 변경
+                        DeviceStatusColor = isConnected ? Brushes.LimeGreen : Brushes.Red;
+
+                        // 3. 로그 남기기 (선택 사항)
+                        AddLog(isConnected ? "SYSTEM: 설비와 연결되었습니다." : "SYSTEM: 설비 연결이 해제되었습니다.");
+                    })
+                );
             };
 
             //목록초기화
@@ -266,6 +308,9 @@ namespace MiniMes.Client.ViewModels
             StartCommand = new RelayCommand(async () => await ExecuteStartWork(), () => CanExecuteStart());
             StopCommand = new RelayCommand(async () => await ExecuteStopWork(), () => CanExecuteStop());
 
+            // 검색 버튼과 연결될 명령 (ExecuteLoadCommandAsync를 재사용하되 검색 로직 포함)
+            SearchCommand = new RelayCommand(async () => await ExecuteSearchAsync());
+
             // [추가] 디자인 모드(Visual Studio 디자이너 화면)라면 여기서 중단!
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
             // 화면이 켜지자마자 데이터를 한 번 불러옵니다.
@@ -284,6 +329,8 @@ namespace MiniMes.Client.ViewModels
         private bool CanExecuteStartWorkCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Wait; // '대기'일 때만 시작 가능
         private bool CanExecuteCompleteWorkCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Processing; // '진행중'일 때만 완료 가능
 
+
+
         // [7. 실제 행동들] 버튼을 눌렀을 때 실행되는 비동기 로직입니다.
         // 데이터를 불러오는 로직
         // [개선] 스레드 안전성과 취소 로직이 추가된 로드 명령
@@ -296,18 +343,17 @@ namespace MiniMes.Client.ViewModels
             _loadCts?.Cancel();
             _loadCts = new CancellationTokenSource();
             var token = _loadCts.Token;
-
-
             
             try
             {
-                if (FlagYn == true)
-                {
+                //if (FlagYn == true)
+                //{
                     IsLoading = true;// 로딩 시작 (XAML의 오버레이가 나타남)
                     StatisticsSummary = "데이터를 불러오는 중...";
 
                     // DB에서 데이터를 가져오는 동안 UI가 멈추지 않도록 비동기 호출a
-                    var data = await _service.GetAllWorkOrdersAsync(SelectedStatusCode);
+                    var data = await _service.GetAllWorkOrdersAsync(SelectedStatusCode
+                        ,StartDate, EndDate, SearchText);
 
                     var dataList = data.ToList();
                     double totalCount = dataList.Count; // 전체 개수 파악
@@ -362,32 +408,6 @@ namespace MiniMes.Client.ViewModels
                     // 4. 리스트 추가가 끝나면 미리 돌려놨던 통계 결과를 가져와 표시
                     StatisticsSummary = await statsTask;
                     LoadingProgress = 100;//완료시 100
-
-
-                    /*
-                    foreach (var item in data)
-                    {
-                        // 수만 건일 경우를 대비해 취소 체크를 루프 안에서도 수행 가능
-                        if (token.IsCancellationRequested) break;
-                        WorkOrders.Add(item);
-                    }
-                    // 3. [Task.Run 활용] CPU 작업: 10만 건 통계 계산을 백그라운드에서 실행
-                    // 이 과정 동안 ProgressBar 애니메이션은 멈추지 않고 부드럽게 돌아갑니다.
-                    StatisticsSummary = "분석 연산 중...";
-
-                    string statsResult = await Task.Run(() =>
-                    {
-                        //실제 무거운 연산(10만건 루프)
-                        var total = data.Sum(x => x.Quantity);
-                        var complete = data.Count(x => x.StatusEnum == WorkOrderStatus.Complete);
-                        //의도적인 부하 테스트를 위해 복잡한 가공이 들어가는 곳입니다.
-                        return $"총 지시수량: {total:N0} | 완료 건수:{complete:N0}건";
-                    }, token);
-                    StatisticsSummary = statsResult; // 계산 완료 후 UI 반영
-                    */
-
-
-
                     // 2. [병렬 처리] 데이터 추가와 통계 연산을 동시에 시작합니다.
                     // 통계 연산 작업 시작 (결과는 나중에 await로 받음)
                     //Task.Run을 사용하는 핵심적인 이유는 딱 한 문장으로 요약됩니다:
@@ -488,7 +508,7 @@ namespace MiniMes.Client.ViewModels
                         }
                     }
                      */
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -609,13 +629,6 @@ namespace MiniMes.Client.ViewModels
             OpenResultWindowRequested?.Invoke(listViewModel, $"작업 실적 조회: {SelectedWorkOrder.ItemCode}");
         }
 
-        // 8. Property Changed Implementation
-        //public event PropertyChangedEventHandler? PropertyChanged;
-        //protected void OnPropertyChanged(string propertyName)
-        //{
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        //}
-
         // ---------------------------------------------------------------------
         // 신규 로직: 작업 시작 실행
         // ---------------------------------------------------------------------
@@ -635,7 +648,7 @@ namespace MiniMes.Client.ViewModels
                 _serialDeviceService.Open("COM1");
 
                 // 3. (옵션) PLC에게 시작 신호를 보내야 한다면
-                // _serialService.SendMessage("START_ORDER");
+                //_serialService.SendMessage("START_ORDER");
 
                 // --- 수정 포인트: 재조회 전 로딩 플래그 해제 ---
                 // ExecuteLoadCommandAsync 내부에도 IsLoading을 true로 만드는 로직이 있으므로,
@@ -748,6 +761,14 @@ namespace MiniMes.Client.ViewModels
         {
             CommunicationLogs.Insert(0, $"[{DateTime.Now:HH:mm:ss}] {msg}");
             if (CommunicationLogs.Count > 100) CommunicationLogs.RemoveAt(100);
+        }
+
+        // 신규 검색 전용 메서드
+        private async Task ExecuteSearchAsync()
+        {
+            // 검색 시에는 무조건 로딩 바를 보여주고 강제 재조회
+            FlagYn = true;
+            await ExecuteLoadCommandAsync();
         }
     }
 }

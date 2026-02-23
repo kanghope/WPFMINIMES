@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiniMES.Infastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+10af996278d53ddc28d2b228106cd26ca8a5fd03")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51053d939bba74d4ce64ee5c8389956abe0ff8e6")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiniMES.Infastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiniMES.Infastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

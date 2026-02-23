@@ -14,9 +14,17 @@
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)uno.foundation\6.0.465\buildTransitive\Uno.Foundation.props" Condition="Exists('$(NuGetPackageRoot)uno.foundation\6.0.465\buildTransitive\Uno.Foundation.props')" />
+    <Import Project="$(NuGetPackageRoot)uno.winrt\6.0.465\buildTransitive\Uno.WinRT.props" Condition="Exists('$(NuGetPackageRoot)uno.winrt\6.0.465\buildTransitive\Uno.WinRT.props')" />
+    <Import Project="$(NuGetPackageRoot)uno.fonts.fluent\2.6.1\buildTransitive\Uno.Fonts.Fluent.props" Condition="Exists('$(NuGetPackageRoot)uno.fonts.fluent\2.6.1\buildTransitive\Uno.Fonts.Fluent.props')" />
+    <Import Project="$(NuGetPackageRoot)uno.winui\6.0.465\buildTransitive\net9.0-windows\uno.winui.props" Condition="Exists('$(NuGetPackageRoot)uno.winui\6.0.465\buildTransitive\net9.0-windows\uno.winui.props')" />
+    <Import Project="$(NuGetPackageRoot)skiasharp.nativeassets.webassembly\2.88.9\buildTransitive\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.props" Condition="Exists('$(NuGetPackageRoot)skiasharp.nativeassets.webassembly\2.88.9\buildTransitive\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.props')" />
     <Import Project="$(NuGetPackageRoot)entityframework\6.5.1\buildTransitive\net6.0\EntityFramework.props" Condition="Exists('$(NuGetPackageRoot)entityframework\6.5.1\buildTransitive\net6.0\EntityFramework.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgUno_Foundation Condition=" '$(PkgUno_Foundation)' == '' ">C:\Users\tansa\.nuget\packages\uno.foundation\6.0.465</PkgUno_Foundation>
+    <PkgUno_WinRT Condition=" '$(PkgUno_WinRT)' == '' ">C:\Users\tansa\.nuget\packages\uno.winrt\6.0.465</PkgUno_WinRT>
+    <PkgUno_WinUI Condition=" '$(PkgUno_WinUI)' == '' ">C:\Users\tansa\.nuget\packages\uno.winui\6.0.465</PkgUno_WinUI>
     <PkgEntityFramework Condition=" '$(PkgEntityFramework)' == '' ">C:\Users\tansa\.nuget\packages\entityframework\6.5.1</PkgEntityFramework>
   </PropertyGroup>
 </Project>

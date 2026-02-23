@@ -17,6 +17,20 @@ namespace MiniMes.Domain.DTOs
         public string ItemCode { get; set; }    // 제품 코드 (예: "BOLT_01")
         public int Quantity { get; set; }       // 주문 수량
         public string Status { get; set; }      // 원본 상태값 (DB에는 "W", "P", "C" 등으로 저장됨)
+        public DateTime WoDate { get; set; }      //등록일
+        public int? CompleteQty { get; set; } //완료된 정상 수량
+
+        // 화면의 ProgressBar와 바인딩될 프로퍼티
+        public double ProgressValue
+        {
+            get
+            {
+                if (Quantity <= 0) return 0;
+                // (완료수량 / 계획수량) * 100 A ?? B A가 NULL이 아니면 A를 쓰고 NULL이면 B를써라.
+                double progress = ((double)(CompleteQty ?? 0) / Quantity) * 100;
+                return progress > 100 ? 100 : progress; // 100% 넘지 않게 방어
+            }
+        }
 
         // [2. 화면 표시용 속성] 
         // 사용자가 "W"라고 보면 무슨 뜻인지 모르니, 친절하게 "대기"라고 바꿔서 보여주는 역할입니다.

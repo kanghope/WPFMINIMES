@@ -28,6 +28,14 @@ namespace MiniMes.Client
 
         private void ConfigureServices(IServiceCollection services)
         {
+            /*
+            구분          ,AddSingleton,                                    AddTransient
+            생성          횟수,단 1번(최초 요청 시)                         ,요청할 때마다 매번
+            데이터 유지,  프로그램 종료 시까지 유지됨,                      요청이 끝나면 초기화됨
+            메모리 효율,  "하나만 쓰므로 메모리 절약 (단, 계속 점유)"       ,쓰고 버리므로 누적 메모리 부하 적음
+            주요 대상,    "SerialDeviceService, AuthService"                ,"LoginView, WorkOrderEditViewModel"
+            */
+            //AddSingleton, AddTransient 객체를 얼마나 자주 새로 만드느냐(수명주기) 차이
             // 1. 서비스 등록 (IAuthService 필수!)
             services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<IWorkOrderService, WorkOrderService>();
@@ -84,6 +92,11 @@ namespace MiniMes.Client
             {
                 // Dispatcher를 사용해 UI 스레드가 현재 밀린 작업(로그인 창 닫기 등)을 
                 // 모두 처리한 후에 MainWindow를 만들도록 예약합니다.
+                //보조 작업자가 메인 작업자(UI 스레드)에게 '이것 좀 화면에 그려줘'
+                //Dispatcher.BeginInvoke** 를 사용해서 메인 스레드에게 업무를 전달
+                //Dispatcher: 메인 스레드가 할 일들을 쌓아두는 **'업무 대기열(Queue)'**입니다.
+                //CurrentDispatcher: 현재 이 코드가 속한 스레드의 관리자를 찾습니다.
+                //BeginInvoke: "이 일 좀 해줘"라고 부탁하고, 보조 스레드는 자기 할 일을 하러 바로 떠납니다(비동기). (대답을 기다리지 않습니다.)
                 Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
                 {
                     try
@@ -97,6 +110,15 @@ namespace MiniMes.Client
                         Shutdown();
                     }
                 }), System.Windows.Threading.DispatcherPriority.Background);
+                //급한 일(화면 멈춤 방지)부터 처리하고, 이 작업은 조금 이따가 여유 있을 때 해줘"**라고 우선순위를 정해주는 것
+                /*
+                 * 장비 신호 폭주: PLC에서 데이터가 미친 듯이 들어옵니다.
+                    DispatcherPriority.Background 사용: 데이터가 들어올 때마다 화면 숫자를 바꾸라는 명령을 Background로 던집니다.
+                    결과: 컴퓨터는 사용자가 버튼을 누르는 동작을 최우선으로 처리하고, 남는 시간에 화면의 생산 수량을 업데이트합니다. 
+                    덕분에 데이터는 실시간으로 반영되면서도 마우스 조작은 부드럽게 유지됩니다.
+                    Background 파라미터는 **"UI의 반응성(Responsiveness)을 보장하기 위한 안전장치"**입니다. 
+                    사용자 경험을 해치지 않으면서 백그라운드 데이터를 화면에 뿌리고 싶을 때 사용하는 실무적인 기법입니다.
+                 */
             }
         }
     }

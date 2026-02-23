@@ -29,7 +29,7 @@ namespace MiniMes.Infrastructure.Services
         // ---------------------------------------------------------------------
         // 1. 모든 작업지시 목록 가져오기 (창고 뒤져서 다 보여주기)
         // ---------------------------------------------------------------------
-        public async Task<List<WorkOrderDto>> GetAllWorkOrdersAsync(string strWoStatus)
+        public async Task<List<WorkOrderDto>> GetAllWorkOrdersAsync(string strWoStatus, DateTime? startDate = null, DateTime? endDate = null, string searchText = null)
         {
             // using: DB 연결 상자를 열고, 작업이 끝나면 자동으로 안전하게 닫습니다.
             using (var context = new MesDbContext())
@@ -43,7 +43,39 @@ namespace MiniMes.Infrastructure.Services
                 {
                     strQuery = strQuery.Where(e => e.WO_STATUS == strWoStatus);
                 }
+                else
+                {
+                    // "전체(ALL)"인 경우: 'P'(진행)와 'W'(대기) 상태인 것만 포함
+                    // SQL의 WHERE WO_STATUS IN ('P', 'W') 와 같은 역할을 합니다.
+                    //var targetStatuses = new[] { "P", "W" }
+;                   //strQuery = strQuery.Where(e => targetStatuse"s.Contains(e.WO_STATUS));
+                    strQuery = strQuery.Where(e => e.WO_STATUS == "P" || e.WO_STATUS == "W");
+                }
+
+                // 3. [추가] 기간 조회 (WO_DATE 기준)
+                // 시작일의 00:00:00부터 종료일의 23:59:59까지 포함하도록 날짜 처리가 중요합니다.
+                if (startDate.HasValue)
+                {
+                    var start = startDate.Value.Date;
+                    strQuery = strQuery.Where(e => e.WO_DATE >= start);
+                }
+
+                if (endDate.HasValue)
+                {
+                    var end = endDate.Value.Date.AddDays(1).AddTicks(-1); // 해당 날짜의 끝 시간까지 포함
+                    strQuery = strQuery.Where(e => e.WO_DATE <= end);
+                }
+
+                // 4. [추가] 검색어 필터링 (품목코드나 지시 ID)
+                if (!string.IsNullOrWhiteSpace(searchText))
+                {
+                    // 품목코드나 다른 필드에 검색어가 포함(Contains)되어 있는지 검사
+                    strQuery = strQuery.Where(e => e.ITEM_CODE.Contains(searchText) || e.WO_ID.ToString().Contains(searchText));
+                }
+
+                // 5. [성능 최적화] 최신순 정렬 후 필요한 데이터만 익명 객체로 가져오기
                 var entities = await strQuery
+                    .OrderByDescending(e => e.WO_DATE) // 최근 지시가 위로 오게 정렬
                     .Select(e => new
                     {
                         e.WO_ID,
@@ -51,8 +83,7 @@ namespace MiniMes.Infrastructure.Services
                         e.WO_QTY,
                         e.WO_STATUS,
                         e.WO_DATE,
-                        e.UPDATED_AT,
-                        e.CREATED_AT
+                        e.COMPLETE_QTY
                     }).ToListAsync();
 
                 // DB에서 꺼낸 원본 데이터(Entity)를 화면에 보여주기 좋은 형태(Dto)로 예쁘게 포장해서 돌려줍니다.
@@ -61,7 +92,14 @@ namespace MiniMes.Infrastructure.Services
                     Id = e.WO_ID,
                     ItemCode = e.ITEM_CODE,
                     Quantity = e.WO_QTY,
-                    Status = e.WO_STATUS
+                    Status = e.WO_STATUS,
+                    WoDate = e.WO_DATE,
+                    // e.COMPLETE_QTY가 null이면 0을 넣고, 아니면 int로 변환
+                    /*
+                     HasValue의 역할
+                     true: 상자 안에 값이 들어있음 (꺼내서 써도 안전함)
+                     false: 상자가 비어있음 (null 상태, 억지로 꺼내려 하면 에러 발생)*/
+                    CompleteQty = e.COMPLETE_QTY.HasValue? (int)e.COMPLETE_QTY : 0,
                 }).ToList();
             }
         }

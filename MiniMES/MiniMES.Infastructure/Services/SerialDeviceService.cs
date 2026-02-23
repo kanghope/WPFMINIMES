@@ -8,7 +8,6 @@ using System.Data.SqlClient;
 using System.IO.Ports; // 시리얼 통신을 위한 네임스페이스
 using System.Linq;
 using System.Windows;
-
 using MiniMES.Infrastructure.Auth;
 
 namespace MiniMES.Infastructure.Services
@@ -19,9 +18,15 @@ namespace MiniMES.Infastructure.Services
     public class SerialDeviceService : IDisposable
     {
         private SerialPort? _port;
-       
+        private System.Timers.Timer? _reconnectTimer; // [추가] 재연결 감시용 타이머
+        private string? _lastPortName;  // [추가] 마지막으로 시도한 포트명 저장
+        private int _lastBaudRate;      // [추가] 마지막으로 시도한 속도 저장
+
         private readonly string? _connStr = ConfigurationManager.ConnectionStrings["MesConnection"].ConnectionString;
         private readonly IWorkOrderRepository? _repo;
+
+        // [추가] 연결 상태가 변했을 때 UI에 알리기 위한 이벤트
+        public event Action<bool>? OnConnectionStatusChanged;
 
         // 데이터가 처리되었을 때 UI(ViewModel)에 알리기 위한 이벤트
         public event Action<bool>? OnRefreshRequired;
@@ -45,6 +50,11 @@ namespace MiniMES.Infastructure.Services
         public SerialDeviceService(IWorkOrderRepository repo)
         {
             _repo = repo;
+
+            // [추가] 재연결 타이머 초기화 (5초마다 체크)
+            _reconnectTimer = new System.Timers.Timer(5000);
+            _reconnectTimer.Elapsed += async (s, e) => await CheckConnection();
+            _reconnectTimer.AutoReset = true;
         }
 
         /// <summary>
@@ -81,14 +91,42 @@ namespace MiniMES.Infastructure.Services
                 _port.DataReceived += SerialPort_DataReceived;
                 _port.Open();
 
-                
+                _reconnectTimer?.Start(); // 연결 성공 시 타이머 시작
+                OnConnectionStatusChanged?.Invoke(true); // 연결 성공 알림
             }
             catch (Exception ex)
             {
                 // 실무: Log4Net 또는 Serilog 사용 권장
+                _reconnectTimer?.Start(); // 실패해도 타이머는 돌려서 계속 재시도
+                OnConnectionStatusChanged?.Invoke(false);
                 throw new Exception($"[PLC] {portName} 연결 실패: {ex.Message}");
             }
         }
+
+        // [핵심 추가] 연결 상태 체크 및 재연결 시도
+        private async Task CheckConnection()
+        {
+            // 포트가 없거나 닫혀 있는 경우
+            if (_port == null || !_port.IsOpen)
+            {
+                OnConnectionStatusChanged?.Invoke(false);
+                Console.WriteLine($"[DEBUG] 통신 끊김 감지. 재연결 시도 중... ({_lastPortName})");
+
+                try
+                {
+                    // 다시 Open 시도
+                    if (!string.IsNullOrEmpty(_lastPortName))
+                    {
+                        Open(_lastPortName, _lastBaudRate);
+                    }
+                }
+                catch
+                {
+                    // 재시도 실패 시 다음 타이머 주기에 다시 시도
+                }
+            }
+        }
+
         // [추가] 데이터 수신 부분을 별도 메서드로 분리 (안정성)
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
@@ -156,52 +194,14 @@ namespace MiniMES.Infastructure.Services
                         // 알람 로그 등을 DB에 저장하는 로직을 여기에 추가 가능
                         break;
                 }
-
-                /*
-                using (var conn = new SqlConnection(_connStr))
-                {
-                    // 1. Raw 로그 저장
-                    var logId = conn.QuerySingle<long>(
-                        "SP_InsertEquipmentLog",
-                        new { EqCode = eqCode, Direction = "IN", RawData = data },
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    // 2. 실적 처리
-                    _repo?.ProcessProduction(eqCode, logId, okQty, ngQty, "SYSTEM");
-
-                    // 3. UI 갱신 알림
-                    OnRefreshRequired?.Invoke();
-                }*/
-
             }
             catch (Exception ex)
             {
                 // DB 입력 실패 시 로그 및 현장 알림 로직 필요
+                // 시리얼 수신 스레드에서 발생하는 에러가 UI를 죽이지 않도록 로그만 남깁니다.
+                System.Diagnostics.Debug.WriteLine($"[DB Error] 오류 발생: {ex.Message}");
             }
-            /*
-            using (var conn = new SqlConnection(_connStr))
-            {
-                // 1. Raw 로그 저장 (프로시저 호출 방식)
-                var parts = data.Split(',');
-                if (parts.Length < 3) return; // 데이터 형식이 맞지 않으면 종료
-
-                string eqCode = parts[0];
-
-                // SP_InsertEquipmentLog 프로시저 호출하여 LogId 받아오기
-                var logId = conn.QuerySingle<long>(
-                    "SP_InsertEquipmentLog",
-                    new { EqCode = eqCode, Direction = "IN", RawData = data },
-                    commandType: CommandType.StoredProcedure
-                );
-
-                // 2. Repository의 실적 처리 SP 호출 (WorkOrder 수량 업데이트 등)
-                // parts[1]: 양품수량, parts[2]: 불량수량
-                _repo.ProcessProduction(eqCode, logId, int.Parse(parts[1]), int.Parse(parts[2]), "SYSTEM");
-
-                // 3. UI 갱신 알림 이벤트 발생 (메인 스레드 호출은 ViewModel에서 처리)
-                OnRefreshRequired?.Invoke();
-            }*/
+           
 
         }
 
@@ -252,13 +252,15 @@ namespace MiniMES.Infastructure.Services
         }
         public void Close()
         {
+            _reconnectTimer?.Stop(); // 닫을 때는 타이머도 정지
             if (_port != null)
             {
-                if (_port.IsOpen) _port.Close();
                 _port.DataReceived -= SerialPort_DataReceived;
+                if (_port.IsOpen) _port.Close();
                 _port.Dispose();
                 _port = null;
             }
+            OnConnectionStatusChanged?.Invoke(false);
         }
         /// <summary>
         /// 서비스 종료 시 포트를 닫아 메모리 누수를 방지합니다.
