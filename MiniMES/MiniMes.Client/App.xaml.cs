@@ -40,6 +40,11 @@ namespace MiniMes.Client
             services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<IWorkOrderService, WorkOrderService>();
             services.AddSingleton<IWorkResultService, WorkResultServicePro>();
+            services.AddSingleton<IDashboardService, DashboardService>();
+            // [추가] 대시보드 데이터 조회를 위한 전용 서비스 등록
+            services.AddSingleton<DashboardService>();
+
+
             // 1. 먼저 Repository를 등록해야 합니다. (IWorkOrderRepository 구현체가 무엇인지 확인)
             services.AddSingleton<IWorkOrderRepository, WorkOrderRepository>();
             // ★ [추가] SerialDeviceService 등록 ★
@@ -60,6 +65,9 @@ namespace MiniMes.Client
             services.AddTransient<WorkOrderEditViewModel>();
             services.AddTransient<WorkResultListViewModel>();
             services.AddTransient<WorkResultRegisterViewModel>();
+
+            // [추가] 대시보드 뷰모델 등록 (전역 PlcService를 주입받음)
+            services.AddTransient<DashboardViewModel>();
 
             // 3. View(화면) 등록 ★이 부분이 핵심입니다★
             // 반드시 클래스의 전체 경로(Namespace)가 맞는지 확인하세요.
@@ -120,6 +128,16 @@ namespace MiniMes.Client
                     사용자 경험을 해치지 않으면서 백그라운드 데이터를 화면에 뿌리고 싶을 때 사용하는 실무적인 기법입니다.
                  */
             }
+        }
+
+        // [추가] 프로그램 종료 시 처리
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // 프로그램이 꺼질 때 열려있는 시리얼 포트를 안전하게 닫습니다.
+            var plcService = ServiceProvider?.GetService<SerialDeviceService>();
+            plcService?.Dispose();
+
+            base.OnExit(e);
         }
     }
 }

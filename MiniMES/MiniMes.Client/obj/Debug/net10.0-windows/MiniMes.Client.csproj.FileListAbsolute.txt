@@ -146,7 +146,6 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client_Ma
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\App.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderListView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.g.resources
-D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.GeneratedMSBuildEditorConfig.editorconfig
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.AssemblyInfoInputs.cache
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.AssemblyInfo.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.csproj.CoreCompileInputs.cache
@@ -157,3 +156,6 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\refint\MiniMes.Cl
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.pdb
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.genruntimeconfig.cache
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\ref\MiniMes.Client.dll
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.GeneratedMSBuildEditorConfig.editorconfig
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\DashboardView.baml
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\DashboardView.g.cs

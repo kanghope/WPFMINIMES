@@ -26,6 +26,9 @@ namespace MiniMes.Client
 
             // [추가] 창이 열릴 때 로그인 정보를 화면에 표시
             LoadUserInfo();
+
+            // [추가] 처음 창이 뜰 때 기본 화면으로 대시보드를 보여줍니다.
+            OnOpenDashboardClick(null, null);
         }
         private void LoadUserInfo()
         {
@@ -33,7 +36,21 @@ namespace MiniMes.Client
             TxtUserName.Text = $"{UserSession.UserName ?? "미로그인"} 님";
             TxtUserRole.Text = UserSession.UserRole == "ADMIN" ? "시스템 관리자" : "일반 작업자";
         }
+        // [추가] 실시간 대시보드 화면 열기
+        private void OnOpenDashboardClick(object sender, RoutedEventArgs e)
+        {
+            // 1. DI 컨테이너에서 뷰모델을 먼저 가져옵니다 (PLC 서비스 등이 주입된 상태)
+            var viewModel = App.ServiceProvider?.GetRequiredService<DashboardViewModel>();
+            // 2. 대시보드 뷰를 생성합니다.
+            var view = new DashboardView();
+            // 3. 뷰와 뷰모델을 연결합니다.
+            view.DataContext = App.ServiceProvider?.GetService<DashboardViewModel>();
+            // 4. 메인 영역에 표시합니다.
+            MainContent.Content = view;
 
+
+        }
+        //로그아웃
         private void OnLogoutClick(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("로그아웃 하시겠습니까?", "확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -54,6 +71,7 @@ namespace MiniMes.Client
                 }
             }
         }
+        // 작업 지시 관리 화면 열기
         private void OnOpenWorkOrderClick(object sender, RoutedEventArgs e)
         {
             // 1. 표시할 화면(UserControl)과 그에 맞는 뷰모델을 준비합니다.

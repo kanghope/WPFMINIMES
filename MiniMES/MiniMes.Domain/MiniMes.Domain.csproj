@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons\WorkOrderStatus.cs" />
+    <Compile Include="DTOs\DashboardSummaryDto.cs" />
     <Compile Include="DTOs\WorkOrderDto.cs" />
     <Compile Include="DTOs\WorkResultDto.cs" />
     <Compile Include="Entities\BaseEntity.cs" />

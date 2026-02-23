@@ -143,7 +143,15 @@ namespace MiniMES.Infastructure.Services
                         // [핵심 추가] 수신된 원본 데이터를 구독자(ViewModel)에게 즉시 알림
                         // 비동기로 처리하여 데이터 분석(HandleData)과 UI 로그 출력이 동시에 일어나게 합니다.
                         OnDataReceived?.Invoke(data);
-                        Task.Run(() => HandleData(data));
+                        //Task.Run(() => HandleData(data));
+                        // [수정] 분석 및 저장을 수행하고, 완료 후 UI에 알림
+                        // Task.Run을 사용하여 비동기로 실행해야 UI 스레드가 안 막힙니다.
+                        Task.Run(async () => {
+                            HandleData(data); // 기존 메서드 호출
+
+                            // [추가] 데이터 처리가 끝났으므로 대시보드에게 새로고침하라고 신호를 보냅니다.
+                            OnRefreshRequired?.Invoke(true);
+                        });
                     }
                 }
             }
