@@ -29,6 +29,8 @@ namespace MiniMES.Infastructure.Services
         public event Action<bool>? OnConnectionStatusChanged;
 
         // 데이터가 처리되었을 때 UI(ViewModel)에 알리기 위한 이벤트
+        //event: 외부에서 이 이벤트를 마음대로 호출하지 못하게 막고, 오직 +=(구독)와 -=(해지)만 가능하도록 제한하는 안전장치입니다.
+        //Action<bool>: 이 이벤트가 발생할 때 bool 데이터 하나를 실어서 보내겠다는 약속(델리게이트)입니다.
         public event Action<bool>? OnRefreshRequired;
 
         // [추가] 설비가 가동 시작(START) 신호를 보냈을 때 발생할 이벤트
@@ -150,6 +152,7 @@ namespace MiniMES.Infastructure.Services
                             HandleData(data); // 기존 메서드 호출
 
                             // [추가] 데이터 처리가 끝났으므로 대시보드에게 새로고침하라고 신호를 보냅니다.
+                            //"나 방금 새로운 생산 실적을 DB에 넣었어! 화면을 새로고침해야 해!
                             OnRefreshRequired?.Invoke(true);
                         });
                     }

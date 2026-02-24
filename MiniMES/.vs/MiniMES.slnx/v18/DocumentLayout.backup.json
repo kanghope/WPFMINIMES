@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\WPFMINIMES\\MiniMES\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D88FA068-9482-B983-0DB1-DE21A4C978F2}|MiniMES.Infastructure\\MiniMES.Infastructure.csproj|d:\\wpfminimes\\minimes\\minimes.infastructure\\services\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D88FA068-9482-B983-0DB1-DE21A4C978F2}|MiniMES.Infastructure\\MiniMES.Infastructure.csproj|solutionrelative:minimes.infastructure\\services\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|solutionrelative:minimes.client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -65,10 +69,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|d:\\wpfminimes\\minimes\\minimes.client\\viewmodels\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8EF962ED-F670-AE4C-392A-F0A768D05CBF}|MiniMes.Client\\MiniMes.Client.csproj|solutionrelative:minimes.client\\viewmodels\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D88FA068-9482-B983-0DB1-DE21A4C978F2}|MiniMES.Infastructure\\MiniMES.Infastructure.csproj|d:\\wpfminimes\\minimes\\minimes.infastructure\\services\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D88FA068-9482-B983-0DB1-DE21A4C978F2}|MiniMES.Infastructure\\MiniMES.Infastructure.csproj|solutionrelative:minimes.infastructure\\services\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D88FA068-9482-B983-0DB1-DE21A4C978F2}|MiniMES.Infastructure\\MiniMES.Infastructure.csproj|d:\\wpfminimes\\minimes\\minimes.infastructure\\services\\serialdeviceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -221,7 +221,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -241,7 +241,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "DashboardView.xaml.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\DashboardView.xaml.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\DashboardView.xaml.cs",
@@ -254,7 +254,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "DashboardView.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\DashboardView.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\DashboardView.xaml",
@@ -266,7 +266,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\MainWindow.xaml.cs",
@@ -279,20 +279,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "WorkOrderEditView.xaml.cs",
-              "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
-              "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
-              "ToolTip": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
-              "RelativeToolTip": "MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAkwDUAAABCAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-11T11:10:46.871Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "LoginView.xaml.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\LoginView.xaml.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\LoginView.xaml.cs",
@@ -305,7 +292,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "WorkOrderListView.xaml.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderListView.xaml.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkOrderListView.xaml.cs",
@@ -318,7 +305,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "WorkOrderListView.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderListView.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkOrderListView.xaml",
@@ -330,7 +317,33 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DashboardService.cs",
+              "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\Services\\DashboardService.cs",
+              "RelativeDocumentMoniker": "MiniMES.Infastructure\\Services\\DashboardService.cs",
+              "ToolTip": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\Services\\DashboardService.cs*",
+              "RelativeToolTip": "MiniMES.Infastructure\\Services\\DashboardService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T13:04:45.207Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 7,
+              "Title": "WorkOrderEditView.xaml.cs",
+              "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
+              "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
+              "ToolTip": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
+              "RelativeToolTip": "MiniMes.Client\\Views\\WorkOrderEditView.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAkwDUAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T11:10:46.871Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\MainWindow.xaml",
@@ -342,7 +355,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "WorkOrderEditView.xaml",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\Views\\WorkOrderEditView.xaml",
               "RelativeDocumentMoniker": "MiniMes.Client\\Views\\WorkOrderEditView.xaml",
@@ -354,7 +367,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "App.xaml.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\App.xaml.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\App.xaml.cs",
@@ -367,7 +380,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "DashboardViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\DashboardViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\DashboardViewModel.cs",
@@ -380,7 +393,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "WorkOrderListViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\WorkOrderListViewModel.cs",
@@ -393,7 +406,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "WorkResultListViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkResultListViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\WorkResultListViewModel.cs",
@@ -406,7 +419,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "WorkResultRegisterViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkResultRegisterViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\WorkResultRegisterViewModel.cs",
@@ -419,7 +432,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "WorkOrderEditViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\WorkOrderEditViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\WorkOrderEditViewModel.cs",
@@ -432,7 +445,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "LoginViewModel.cs",
               "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMes.Client\\ViewModels\\LoginViewModel.cs",
               "RelativeDocumentMoniker": "MiniMes.Client\\ViewModels\\LoginViewModel.cs",
@@ -441,19 +454,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-11T13:17:42.927Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "DashboardService.cs",
-              "DocumentMoniker": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\Services\\DashboardService.cs",
-              "RelativeDocumentMoniker": "MiniMES.Infastructure\\Services\\DashboardService.cs",
-              "ToolTip": "D:\\WPFMINIMES\\MiniMES\\MiniMES.Infastructure\\Services\\DashboardService.cs",
-              "RelativeToolTip": "MiniMES.Infastructure\\Services\\DashboardService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-23T13:04:45.207Z",
               "EditorCaption": ""
             },
             {

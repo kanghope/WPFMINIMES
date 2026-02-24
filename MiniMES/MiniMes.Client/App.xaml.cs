@@ -50,6 +50,7 @@ namespace MiniMes.Client
             // ★ [추가] SerialDeviceService 등록 ★
             // 이 서비스는 통신 포트를 하나만 점유해야 하므로 반드시 Singleton으로 등록합니다.
             // 2. 그 다음 SerialDeviceService를 등록합니다.
+            // Singleton으로 등록되어 프로그램 종료 시까지 단 하나의 포트 통신을 유지합니다.
             services.AddSingleton<SerialDeviceService>(sp =>
             {
          
@@ -93,10 +94,16 @@ namespace MiniMes.Client
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            var loginView = ServiceProvider.GetRequiredService<MiniMes.Client.Views.LoginView>();
+
+            // [추가] 프로그램 시작 시 통신 서비스 미리 호출 (포트 감시 시작 준비)
+            // GetRequiredService를 한 번 호출해줘야 Singleton 객체가 생성됩니다.
+            var plcService = ServiceProvider?.GetRequiredService<SerialDeviceService>();
 
 
-            if (loginView.ShowDialog() == true && UserSession.IsLoggedIn)
+            var loginView = ServiceProvider?.GetRequiredService<MiniMes.Client.Views.LoginView>();
+
+
+            if (loginView?.ShowDialog() == true && UserSession.IsLoggedIn)
             {
                 // Dispatcher를 사용해 UI 스레드가 현재 밀린 작업(로그인 창 닫기 등)을 
                 // 모두 처리한 후에 MainWindow를 만들도록 예약합니다.
@@ -109,8 +116,8 @@ namespace MiniMes.Client
                 {
                     try
                     {
-                        var mainView = ServiceProvider.GetRequiredService<MainWindow>();
-                        mainView.Show();
+                        var mainView = ServiceProvider?.GetRequiredService<MainWindow>();
+                        mainView?.Show();
                     }
                     catch (Exception ex)
                     {
@@ -141,5 +148,46 @@ namespace MiniMes.Client
         }
     }
 }
+/*
+ 1. Dispatcher 계열 (UI 스레드에게 부탁하기)
+WPF에서 Dispatcher는 UI 작업을 처리하는 대기열(Queue)입니다.
 
+① Dispatcher.Invoke (동기)
+의미: "지금 당장 이 UI를 바꾸고, 다 바꿀 때까지 나는 여기서 기다릴게."
+
+사용 시점: UI가 즉시 업데이트되어야 하고, 그 다음 코드 로직이 업데이트된 UI 상태에 의존할 때 사용합니다.
+
+단점: UI 작업이 오래 걸리면 백그라운드 스레드도 같이 멈춰버립니다.
+
+② Dispatcher.BeginInvoke (비동기)
+의미: "이 UI 작업 좀 대기열에 넣어줘. 나는 내 할 일 하러 갈게." (대답을 기다리지 않음)
+
+사용 시점: UI 갱신을 요청만 하고 백그라운드 로직은 멈춤 없이 계속 돌아야 할 때 사용합니다.
+
+특징: DispatcherPriority.Background 같은 우선순위를 정할 수 있어 UI 반응성을 높이는 데 유리합니다.
+
+③ Dispatcher.InvokeAsync (비동기 await 가능)
+의미: "이 UI 작업을 예약하고, 완료될 때까지 기다릴 수 있는 티켓(Task)을 줘."
+
+사용 시점: 최신 WPF 라이브러리에서 가장 권장되는 방식입니다. await 키워드와 함께 사용하여 코드를 비동기적으로 깔끔하게 짤 수 있습니다.
+
+④ Dispatcher.InvokeAsync(async () => ...)
+의미: "UI 스레드에서 비동기 작업을 실행해줘."
+
+사용 시점: 본인이 질문하신 RefreshDashboard()처럼 내부에서 DB를 비동기로 조회(await)하는 메서드를 UI 스레드에서 호출해야 할 때 사용합니다.
+
+2. Task.Run (무거운 작업 떠넘기기)
+⑤ Task.Run(() => ...)
+의미: "이 작업은 너무 무거우니 UI 스레드 말고 저기 노는 백그라운드 스레드에서 처리해."
+
+사용 시점: DB 대량 조회, 파일 읽기, PLC 데이터 분석 등 시간이 걸리는 로직을 실행할 때 사용합니다.
+
+중요: 여기서 UI 컨트롤을 직접 건드리면 에러가 납니다. 작업이 끝나면 다시 1번의 Dispatcher를 통해 UI로 돌아와야 합니다.
+
+메서드,       실행 위치,          기다리는가? (Block),     주 사용 용도
+Invoke,       UI 스레드,          Yes                      ,간단하고 즉각적인 UI 변경
+BeginInvoke,  UI 스레드           ,No                      ,로그 출력 등 UI 반응성이 중요할 때
+InvokeAsync,  UI 스레드           ,선택(await)             ,현대적인 WPF 비동기 UI 처리
+Task.Run,     백그라운드           ,No                     ,"DB 저장, PLC 데이터 분석 등 무거운 로직"
+ */
 

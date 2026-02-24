@@ -648,7 +648,7 @@ namespace MiniMes.Client.ViewModels
                 _serialDeviceService.Open("COM1");
 
                 // 3. (옵션) PLC에게 시작 신호를 보내야 한다면
-                //_serialService.SendMessage("START_ORDER");
+                //_serialDeviceService.SendMessage("START_ORDER");
 
                 // --- 수정 포인트: 재조회 전 로딩 플래그 해제 ---
                 // ExecuteLoadCommandAsync 내부에도 IsLoading을 true로 만드는 로직이 있으므로,
@@ -772,3 +772,7 @@ namespace MiniMes.Client.ViewModels
         }
     }
 }
+/*
+ 
+
+ */
