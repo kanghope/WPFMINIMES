@@ -1,9 +1,10 @@
 WPF MINI MES 개인프로젝트
-생산공정관리 일부분만 구현하였으며(작업지시등록, 작업지시수정, 지시삭제, 작업시작(PLC), 작업종료(PLC), 실적 등록/완료, 실적조회)
+생산공정관리 일부분만 구현하였으며(작업지시등록, 작업지시수정, 지시삭제, 작업시작(PLC), 작업종료(PLC), 실적 등록/완료, 실적조회, 대시보드)
 계속 진행중입니다.
 C#, MSSQL, EF CORE, DAPPER, 비동기, 멀티스레드, 시리얼통신(com0com, 허큘러스 활용)MVVM 패턴을
 활용하여 개발하였습니다.
 작업시작, 작업종료 같은경우 실제 plc장비제어의 느낌을 주기위해 com0com, 허큘러스를 활용하여 테스트 진행했으며
 작업수량이 완료되면 자동종료 되거나 작업종료 버튼으로 강제 종료할수있습니다.
 계속 개발 진행중입니다.
-<img width="996" height="596" alt="화면 캡처 2026-02-23 200315" src="https://github.com/user-attachments/assets/27e17f2c-edf5-4a9b-8ce3-df5ba1143219" />
+<img width="996" height="596" alt="화면 캡처 2026-02-23 200315" src="https://github.com/user-attachments/assets/27e17f2c-edf5-4a9b-8ce3-df5ba1143219" /><img width="1082" height="634" alt="화면 캡처 2026-02-27 193458" src="https://github.com/user-attachments/assets/ce667c34-31c0-45cb-8631-5baa581eefd7" />
+
