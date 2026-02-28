@@ -52,7 +52,7 @@ namespace MiniMes.Client.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/MiniMes.Client;V1.0.0.0;component/views/workordereditview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/MiniMes.Client;component/views/workordereditview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\WorkOrderEditView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

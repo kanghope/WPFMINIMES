@@ -41,6 +41,7 @@ namespace MiniMes.Client
             services.AddSingleton<IWorkOrderService, WorkOrderService>();
             services.AddSingleton<IWorkResultService, WorkResultServicePro>();
             services.AddSingleton<IDashboardService, DashboardService>();
+            services.AddSingleton<IItemService, ItemService>();
             // [추가] 대시보드 데이터 조회를 위한 전용 서비스 등록
             services.AddSingleton<DashboardService>();
 
@@ -66,6 +67,7 @@ namespace MiniMes.Client
             services.AddTransient<WorkOrderEditViewModel>();
             services.AddTransient<WorkResultListViewModel>();
             services.AddTransient<WorkResultRegisterViewModel>();
+            services.AddTransient<ItemManagementViewModel>();
 
             // [추가] 대시보드 뷰모델 등록 (전역 PlcService를 주입받음)
             services.AddTransient<DashboardViewModel>();

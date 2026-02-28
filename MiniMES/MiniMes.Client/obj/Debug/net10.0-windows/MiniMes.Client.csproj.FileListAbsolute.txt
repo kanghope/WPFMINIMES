@@ -159,3 +159,5 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\ref\MiniMes.Clien
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.GeneratedMSBuildEditorConfig.editorconfig
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\DashboardView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\DashboardView.g.cs
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemManagementView.g.cs
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemManagementView.baml

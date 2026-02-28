@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using MiniMes.Domain.Entities;
+using MiniMes.Domain.DTOs;
 
 namespace MiniMes.Infrastructure.Data
 {
@@ -22,6 +23,8 @@ namespace MiniMes.Infrastructure.Data
         // DBSet: 각 테이블에 대응되는 컬렉션입니다.
         public DbSet<WorkOrderEntity>? WorkOrders { get; set; }
         public DbSet<WorkResultEntity>? WorkResults { get; set; }
+
+        public DbSet<ItemEntity>? Items { get; set; } 
 
         // [추가] UserEntity를 DB 모델에 포함시킵니다.
         public DbSet<UserEntity>? Users { get; set; }
