@@ -1,0 +1,136 @@
+﻿<Window x:Class="MiniMes.Client.Views.ItemSelectView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="품목 선택 팝업" Height="550" Width="800" 
+        WindowStartupLocation="CenterOwner" 
+        Background="#FFFFFF"
+        AllowsTransparency="False" WindowStyle="ThreeDBorderWindow">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="ItemTypeStyle" TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ItemType}" Value="FG">
+                        <Setter Property="Foreground" Value="#2980B9"/>
+                        <Setter Property="Text" Value="완제품(FG)"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ItemType}" Value="RM">
+                        <Setter Property="Foreground" Value="#27AE60"/>
+                        <Setter Property="Text" Value="원자재(RM)"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ItemType}" Value="SG">
+                        <Setter Property="Foreground" Value="#E67E22"/>
+                        <Setter Property="Text" Value="반제품(SG)"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Background="#F9F9F9" BorderBrush="#DDDDDD" BorderThickness="0,0,0,1" Padding="15,10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="🔍 품목 검색:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                <TextBox Width="300" Height="28" 
+                         VerticalContentAlignment="Center"
+                         Tag="코드 또는 명칭 입력..."
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <Button Content="조회" 
+                        Command="{Binding SearchCommand}" 
+                        Style="{StaticResource MetroBlueButtonStyle}"
+                        Width="80" Height="28" Margin="10,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Background="#E9ECEF" Padding="15,5">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="📋 선택 가능한 자재 목록" FontWeight="Bold" Foreground="#444444"/>
+                <TextBlock Text="(항목을 더블클릭하면 즉시 선택됩니다)" Margin="10,0,0,0" Foreground="#888888" FontSize="11" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <DataGrid Grid.Row="2" 
+                  ItemsSource="{Binding FilteredItems}" 
+                  SelectedItem="{Binding SelectedItem}"
+                  Style="{StaticResource MetroDataGridStyle}"
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True" 
+                  SelectionMode="Single"
+                  Margin="10">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="구분" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Style="{StaticResource ItemTypeStyle}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="품목 코드" Binding="{Binding ItemCode}" Width="150" FontWeight="Bold">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CenterTextColumnStyle}"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="품목 명칭" Binding="{Binding ItemName}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,0,0,0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="단위" Binding="{Binding ItemUnit}" Width="70">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CenterTextColumnStyle}"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="규격" Binding="{Binding ItemSpec}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CenterTextColumnStyle}"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding SelectCommand}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+
+        <Border Grid.Row="3" Background="#F0F0F0" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="✔️ 선택 완료" 
+                        Command="{Binding SelectCommand}" 
+                        Style="{StaticResource MetroBlueButtonStyle}" 
+                        Width="120" Height="32" Margin="0,0,5,0" FontWeight="Bold"/>
+                <Button Content="❌ 닫기" 
+                        Click="Close_Click" 
+                        Style="{StaticResource MetroPinkButtonStyle}" 
+                        Width="100" Height="32"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

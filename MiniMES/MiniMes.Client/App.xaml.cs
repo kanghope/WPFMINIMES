@@ -42,12 +42,14 @@ namespace MiniMes.Client
             services.AddSingleton<IWorkResultService, WorkResultServicePro>();
             services.AddSingleton<IDashboardService, DashboardService>();
             services.AddSingleton<IItemService, ItemService>();
+            services.AddSingleton<IBomService, BomService>();
             // [추가] 대시보드 데이터 조회를 위한 전용 서비스 등록
             services.AddSingleton<DashboardService>();
 
 
             // 1. 먼저 Repository를 등록해야 합니다. (IWorkOrderRepository 구현체가 무엇인지 확인)
             services.AddSingleton<IWorkOrderRepository, WorkOrderRepository>();
+      
             // ★ [추가] SerialDeviceService 등록 ★
             // 이 서비스는 통신 포트를 하나만 점유해야 하므로 반드시 Singleton으로 등록합니다.
             // 2. 그 다음 SerialDeviceService를 등록합니다.
@@ -68,6 +70,7 @@ namespace MiniMes.Client
             services.AddTransient<WorkResultListViewModel>();
             services.AddTransient<WorkResultRegisterViewModel>();
             services.AddTransient<ItemManagementViewModel>();
+            services.AddTransient<BomManagementViewModel>();
 
             // [추가] 대시보드 뷰모델 등록 (전역 PlcService를 주입받음)
             services.AddTransient<DashboardViewModel>();

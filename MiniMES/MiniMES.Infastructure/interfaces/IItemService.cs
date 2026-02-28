@@ -9,5 +9,7 @@ namespace MiniMES.Infastructure.interfaces
         Task<List<ItemDto>> GetAllItemsAsync();
         Task<bool> SaveItemAsync(ItemDto itemDto);
         Task<bool> DeleteItemAsync(string itemCode);
+
+ 
     }
 }

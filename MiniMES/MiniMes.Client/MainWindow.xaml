@@ -30,6 +30,8 @@
                 <TextBlock Text="Mini MES" FontSize="20" Margin="10" HorizontalAlignment="Center" Foreground="#333" FontWeight="Bold"/>
                 <Button Style="{StaticResource MetroBlueButtonStyle}" Content="품목 마스터 관리" 
         Margin="5" Height="45" Click="OnOpenItemMasterClick"/>
+                <Button Style="{StaticResource MetroBlueButtonStyle}" Content="BOM 관리 " 
+Margin="5" Height="45" Click="OnOpenBomClick"/>
                 <Button Style="{StaticResource MetroBlueButtonStyle}" Content="작업 지시 관리" Margin="5" Height="40" Click="OnOpenWorkOrderClick"/>
                 <Button Style="{StaticResource MetroBlueButtonStyle}" Content="실시간 대시보드" 
         Margin="5" Height="45" Click="OnOpenDashboardClick"/>

@@ -98,6 +98,18 @@ namespace MiniMes.Client
             MainContent.Content = view;
 
         }
+        // 품목 마스터 관리 화면 열기
+        private void OnOpenBomClick(object sender, RoutedEventArgs e)
+        {
+            var view = new BomManagementView();
+
+            view.DataContext = App.ServiceProvider?.GetService<BomManagementViewModel>();
+
+            MainContent.Content = view;
+
+        }
+
+        
     }
 }
 
