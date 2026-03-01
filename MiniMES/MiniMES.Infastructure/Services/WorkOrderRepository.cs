@@ -129,5 +129,30 @@ namespace MiniMES.Infastructure.Services
            //}
            
         }
+
+        // WorkOrderRepository 구현부
+        public async Task<IEnumerable<dynamic>> GetBomRequirementAsync(string itemCode)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    var param = new { ItemCode = itemCode };
+
+                    var result = await db.QueryAsync("SP_GetBomRequirement",
+                                            param,
+                                            //transaction: transaction,
+                                            commandType: CommandType.StoredProcedure);
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    //transaction.Rollback();
+                    throw new Exception($"조회 오류 (ID: {itemCode})", ex);
+                }
+               
+            }
+        }
     }
 }

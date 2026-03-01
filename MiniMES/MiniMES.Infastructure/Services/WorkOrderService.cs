@@ -201,9 +201,32 @@ namespace MiniMes.Infrastructure.Services
         // ---------------------------------------------------------------------
         public async Task StartWorkOrderAsync(int woId, string userId, string eqCode)
         {
-            
-            // [신규 방식] Repository를 통해 SP_StartWorkOrder 호출 (설비 연동 및 트랜잭션 포함)
-            await _workOrderRepository.StartWorkOrder(woId, userId, eqCode);
+            using (var context = new MesDbContext())
+            {
+                // 1. 작업지시 정보 조회 (품목 코드와 계획 수량을 알아야 함)
+                var workOrder = await context.WorkOrders.FindAsync(woId); // Entity Framework 기준
+                if (workOrder == null) throw new Exception("작업지시를 찾을 수 없습니다.");
+
+                // 2. [추가] BOM 및 재고 정보 확인
+                // Repository에 구현하신 GetBomRequirementAsync 호출
+                var bomRequirements = await _workOrderRepository.GetBomRequirementAsync(workOrder.ITEM_CODE);
+
+                foreach (var item in bomRequirements)
+                {
+                    // dynamic 타입이므로 SQL 결과 컬럼명과 일치해야 함 (CHILD_ITEM, CONSUMPTION, CURRENT_QTY)
+                    decimal requiredQty = (decimal)item.CONSUMPTION * workOrder.WO_QTY;
+                    decimal currentStock = (decimal)(item.CURRENT_QTY ?? 0m);
+
+                    if (currentStock < requiredQty)
+                    {
+                        throw new Exception($"원재료 재고가 부족합니다. (품목: {item.CHILD_ITEM}, 필요: {requiredQty}, 현재: {currentStock})");
+                    }
+                }
+
+                // 3. 재고가 충분하면 기존 시작 로직 수행
+                // [신규 방식] Repository를 통해 SP_StartWorkOrder 호출 (설비 연동 및 트랜잭션 포함)
+                await _workOrderRepository.StartWorkOrder(woId, userId, eqCode);
+            }
         }
 
         // ---------------------------------------------------------------------

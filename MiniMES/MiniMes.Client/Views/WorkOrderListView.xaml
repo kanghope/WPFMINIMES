@@ -31,7 +31,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="150"/>
+            <RowDefinition Height="130"/>
+            <RowDefinition Height="120"/>
         </Grid.RowDefinitions>
         <StackPanel Margin="10" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Text="조회 기간 :" VerticalAlignment="Center" Margin="10,0,5,0"/>
@@ -144,36 +145,37 @@
             <Button Content="실적 등록/완료" Command="{Binding RegisterResultCommand}" Margin="5" MinWidth="120" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}"/>
             <Button Content="실적 조회" Command="{Binding ViewResultsCommand}" Margin="5" MinWidth="70" Cursor="Hand" Style="{StaticResource MetroBlueButtonStyle}" />
         </StackPanel>
-        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#AAFFFFFF" 
-      Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
-
-            <Border Background="White" BorderBrush="#0078D7" BorderThickness="1" 
-            VerticalAlignment="Center" HorizontalAlignment="Center" 
-            Padding="40,30" CornerRadius="8">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.2" ShadowDepth="3"/>
-                </Border.Effect>
-
-                <StackPanel Width="300">
-                    <TextBlock Text="데이터 처리 및 통신 준비 중" FontSize="16" FontWeight="Bold" 
-                       Foreground="#333333" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-
-                    <ProgressBar Value="{Binding LoadingProgress}" 
-                         Minimum="0" Maximum="100" 
-                         IsIndeterminate="False" 
-                         Height="12" Foreground="#0078D7" Background="#EEEEEE">
-                    </ProgressBar>
-
-                    <TextBlock Text="{Binding LoadingProgress, StringFormat={}{0:F0}%}" 
-                       HorizontalAlignment="Right" Foreground="#0078D7" 
-                       FontSize="12" FontWeight="Bold" Margin="0,5,0,0"/>
-
-                    <TextBlock Text="{Binding StatisticsSummary}" 
-                       Margin="0,20,0,0" HorizontalAlignment="Center" 
-                       FontSize="11" Foreground="#666666"/>
-                </StackPanel>
-            </Border>
-        </Grid>
+        
+        <GroupBox Grid.Row="4" Header="📦 투입 자재 명세 (BOM)" Margin="5,0,5,5" BorderBrush="#CCCCCC">
+            <DataGrid ItemsSource="{Binding BomMaterials}" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True" 
+                      Style="{StaticResource MetroDataGridStyle}"
+                      GridLinesVisibility="Horizontal">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="자재 코드" Binding="{Binding MaterialCode}" Width="150"/>
+                    <DataGridTextColumn Header="자재명" Binding="{Binding MaterialName}" Width="*"/>
+                    <DataGridTextColumn Header="단위 수량" Binding="{Binding UnitQuantity}" Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                <Setter Property="Margin" Value="0,0,10,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="총 필요량" Binding="{Binding TotalRequiredQuantity}" Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="#D35400"/>
+                                <Setter Property="Margin" Value="0,0,10,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
         <GroupBox Grid.Row="5" Header="📡 PLC 실시간 통신 로그" Margin="5" BorderBrush="#CCCCCC">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -204,21 +206,37 @@
                 </Border>
             </Grid>
         </GroupBox>
-        <!--
-        <Grid Grid.Row="0" Grid.RowSpan="3" Background="#AAFFFFFF" 
-              Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.Row="6" Grid.RowSpan="4" Background="#AAFFFFFF" 
+Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+
             <Border Background="White" BorderBrush="#0078D7" BorderThickness="1" 
-                    VerticalAlignment="Center" HorizontalAlignment="Center" Padding="30" CornerRadius="5">
-                <StackPanel>
-                    <ProgressBar IsIndeterminate="True" Width="250" Height="5" Foreground="#0078D7" Background="#EEEEEE"/>
-                    <TextBlock Text="대용량 데이터를 분석하고 있습니다..." 
-                               Margin="0,15,0,0" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#333333"/>
-                    <TextBlock Text="잠시만 기다려 주십시오." 
-                               FontSize="11" Margin="0,5,0,0" HorizontalAlignment="Center" Foreground="#888888"/>
+      VerticalAlignment="Center" HorizontalAlignment="Center" 
+      Padding="40,30" CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.2" ShadowDepth="3"/>
+                </Border.Effect>
+
+                <StackPanel Width="300">
+                    <TextBlock Text="데이터 처리 및 통신 준비 중" FontSize="16" FontWeight="Bold" 
+                 Foreground="#333333" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                    <ProgressBar Value="{Binding LoadingProgress}" 
+                   Minimum="0" Maximum="100" 
+                   IsIndeterminate="False" 
+                   Height="12" Foreground="#0078D7" Background="#EEEEEE">
+                    </ProgressBar>
+
+                    <TextBlock Text="{Binding LoadingProgress, StringFormat={}{0:F0}%}" 
+                 HorizontalAlignment="Right" Foreground="#0078D7" 
+                 FontSize="12" FontWeight="Bold" Margin="0,5,0,0"/>
+
+                    <TextBlock Text="{Binding StatisticsSummary}" 
+                 Margin="0,20,0,0" HorizontalAlignment="Center" 
+                 FontSize="11" Foreground="#666666"/>
                 </StackPanel>
             </Border>
         </Grid>
--->
+
     </Grid>
     
 

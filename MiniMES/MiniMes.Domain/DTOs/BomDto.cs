@@ -66,13 +66,60 @@ namespace MiniMes.Domain.DTOs
         }
 
         private decimal _consumption;
-        /// <summary>
-        /// 소요량: 사용자가 숫자를 수정하면 합계 계산이나 유효성 검사를 위해 알림을 보냅니다.
-        /// </summary>
+        /// <summary> 단위 소요량 (제품 1개당 필요한 양) </summary>
         public decimal Consumption
         {
             get => _consumption;
-            set { _consumption = value; OnPropertyChanged(); }
+            set
+            {
+                _consumption = value;
+                OnPropertyChanged();
+                UpdateCalculatedFields();
+            }
+        }
+
+        private decimal _currentStock;
+        /// <summary> 현재 창고 재고 </summary>
+        public decimal CurrentStock
+        {
+            get => _currentStock;
+            set
+            {
+                _currentStock = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsShortage));
+            }
+        }
+
+        private decimal _parentOrderQty;
+        /// <summary> 작업지시 수량 (부모 품목을 얼마나 만들 것인가) </summary>
+        public decimal ParentOrderQty
+        {
+            get => _parentOrderQty;
+            set
+            {
+                _parentOrderQty = value;
+                OnPropertyChanged();
+                UpdateCalculatedFields();
+            }
+        }
+
+        /// <summary> 총 필요 수량 (단위 소요량 * 지시 수량) </summary>
+        public decimal TotalRequiredQty => Consumption * ParentOrderQty;
+
+        /// <summary> 재고 부족 여부 (현재고 < 총 필요수량) </summary>
+        public bool IsShortage => CurrentStock < TotalRequiredQty;
+
+        /// <summary> 부족한 수량 (화면에 표시용) </summary>
+        public decimal ShortageQty => IsShortage ? TotalRequiredQty - CurrentStock : 0;
+
+
+        // --- 유틸리티 메서드 ---
+        private void UpdateCalculatedFields()
+        {
+            OnPropertyChanged(nameof(TotalRequiredQty));
+            OnPropertyChanged(nameof(IsShortage));
+            OnPropertyChanged(nameof(ShortageQty));
         }
 
         // --- MVVM 패턴의 핵심: PropertyChanged 이벤트 처리 ---

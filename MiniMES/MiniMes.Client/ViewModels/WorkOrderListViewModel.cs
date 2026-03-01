@@ -110,7 +110,9 @@ namespace MiniMes.Client.ViewModels
         public WorkOrderDto? SelectedWorkOrder
         {
             get => _selectedWorkOrder;
-            set { _selectedWorkOrder = value; OnPropertyChanged(nameof(SelectedWorkOrder)); }
+            set { _selectedWorkOrder = value; OnPropertyChanged(nameof(SelectedWorkOrder)); // [추가] 작업 지시를 선택할 때마다 해당 BOM 자재 목록을 불러옵니다.
+                _ = LoadBomMaterialsAsync();
+            }
         }
 
         // IsLoading: "지금 데이터 불러오는 중이에요"를 알려주는 스위치입니다. (로딩바 표시용)
@@ -165,6 +167,14 @@ namespace MiniMes.Client.ViewModels
         {
             get => _searchText;
             set { _searchText = value; OnPropertyChanged(nameof(SearchText)); }
+        }
+
+        // [추가] 선택된 지시의 자재(BOM) 목록을 담을 컬렉션
+        private ObservableCollection<BomDto> _bomMaterials = new ObservableCollection<BomDto>();
+        public ObservableCollection<BomDto> BomMaterials
+        {
+            get => _bomMaterials;
+            set { _bomMaterials = value; OnPropertyChanged(nameof(BomMaterials)); }
         }
 
         // [3. 버튼 명령] XAML의 버튼과 연결될 '리모컨 버튼'들입니다.
@@ -329,7 +339,40 @@ namespace MiniMes.Client.ViewModels
         private bool CanExecuteStartWorkCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Wait; // '대기'일 때만 시작 가능
         private bool CanExecuteCompleteWorkCommand() => SelectedWorkOrder != null && SelectedWorkOrder.StatusEnum == WorkOrderStatus.Processing; // '진행중'일 때만 완료 가능
 
+        // [추가된 로직] 선택된 작업 지시의 BOM 자재 목록을 가져옵니다.
+        private async Task LoadBomMaterialsAsync()
+        {
+            if (SelectedWorkOrder == null)
+            {
+                BomMaterials.Clear();
+                return;
+            }
 
+            try
+            {
+                // 서비스로부터 해당 ItemCode 또는 WorkOrderId에 해당하는 BOM 목록 조회
+                // (IWorkOrderService에 GetBomByWorkOrderIdAsync 같은 메서드가 있다고 가정)
+                var currentItemCode = SelectedWorkOrder.ItemCode;
+                var materials = await _workOrderRepository.GetBomRequirementAsync(currentItemCode);
+
+                // 3. UI 갱신 시점에 여전히 같은 항목이 선택되어 있는지 확인 (중요)
+                if (SelectedWorkOrder?.ItemCode != currentItemCode) return;
+
+                // UI 스레드에서 컬렉션 갱신
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    BomMaterials.Clear();
+                    foreach (var item in materials)
+                    {
+                        BomMaterials.Add(item);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                AddLog($"BOM 조회 실패: {ex.Message}");
+            }
+        }
 
         // [7. 실제 행동들] 버튼을 눌렀을 때 실행되는 비동기 로직입니다.
         // 데이터를 불러오는 로직
@@ -640,12 +683,22 @@ namespace MiniMes.Client.ViewModels
             {
                 IsLoading = true; // 로딩 시작
                                   // 1. DB 상태 변경 (대기 -> 진행)
-                await _workOrderRepository.StartWorkOrder(SelectedWorkOrder.Id, UserSession.UserId, "EQ01");
+                AddLog($"SYSTEM: [{SelectedWorkOrder.ItemCode}] 작업 시작 시도 및 재고 확인 중...");
+
+                // 2. 서비스 호출 (핵심!)
+                // 내부에서 BOM 소요량을 계산하고 재고가 부족하면 throw new Exception을 발생시킵니다.
+                // 이 과정이 성공해야만 DB 상태가 'P'(진행)로 변경됩니다.
+                string userId = UserSession.UserId ?? "ADMIN";
+                string eqCode = "EQ01"; // 필요 시 설비 선택 로직 연결
+
+                await _workOrderRepository.StartWorkOrder(SelectedWorkOrder.Id, userId, eqCode);
 
                 // 2. PLC 통신 시작 (이때 포트를 엽니다)
                 // _serialService는 주입받은 객체
                 // [보완] 포트 이름을 설정에서 가져오거나 체크
+                // 3. 서비스가 성공(재고 통과)했다면 설비 통신 시작
                 _serialDeviceService.Open("COM1");
+                AddLog("SYSTEM: COM1 포트가 오픈되었습니다. 설비 가동 시작.");
 
                 // 3. (옵션) PLC에게 시작 신호를 보내야 한다면
                 //_serialDeviceService.SendMessage("START_ORDER");
@@ -666,7 +719,14 @@ namespace MiniMes.Client.ViewModels
             }
             catch(Exception ex)
             {
-                MessageBox.Show($"설비 연결 실패: {ex.Message}");
+                // 서비스에서 던진 "원재료 재고가 부족합니다 (품목: XXX, 필요: 10, 현재: 2)" 
+                // 메시지가 그대로 MessageBox에 출력됩니다.
+                MessageBox.Show($"작업을 시작할 수 없습니다.\n\n사유: {ex.Message}",
+                                "재고 부족 또는 오류",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+
+                AddLog($"ERROR: {ex.Message}");
             }
             finally
             {
