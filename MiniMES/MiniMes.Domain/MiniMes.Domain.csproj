@@ -44,11 +44,13 @@
     <Compile Include="DTOs\BomDto.cs" />
     <Compile Include="DTOs\DashboardSummaryDto.cs" />
     <Compile Include="DTOs\ItemDto.cs" />
+    <Compile Include="DTOs\StockDto.cs" />
     <Compile Include="Entities\BomEntity.cs" />
     <Compile Include="Entities\ItemEntity.cs" />
     <Compile Include="DTOs\WorkOrderDto.cs" />
     <Compile Include="DTOs\WorkResultDto.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\StockEntity.cs" />
     <Compile Include="Entities\UserEntity.cs" />
     <Compile Include="Entities\WorkOrderEntity.cs" />
     <Compile Include="Entities\WorkResultEntity.cs" />

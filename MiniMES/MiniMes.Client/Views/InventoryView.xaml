@@ -1,0 +1,147 @@
+﻿<UserControl x:Class="MiniMes.Client.Views.InventoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MiniMes.Client.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=vm:InventoryViewModel}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <TextBlock Text="품목 검색 :" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Width="200" Height="25" VerticalContentAlignment="Center">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <Button Content="🔍 조회" 
+                    Command="{Binding SearchCommand}" 
+                    Margin="10,0,0,0" Width="80" Height="25"
+                    Style="{StaticResource MetroBlueButtonStyle}"/>
+            <Button Content="🔄 새로고침" 
+                    Command="{Binding RefreshCommand}" 
+                    Margin="5,0,0,0" Width="80" Height="25"
+                    Style="{StaticResource MetroBlueButtonStyle}"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1" Padding="15,7">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="📊 재고 현황 요약:" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StatisticsSummary}" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#555555"/>
+            </StackPanel>
+        </Border>
+
+        <DataGrid Grid.Row="2" 
+                  ItemsSource="{Binding StockList}"
+                  Style="{StaticResource MetroDataGridStyle}"
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True"
+                  Sorting="DataGrid_Sorting"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  EnableRowVirtualization="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="품목 코드" Binding="{Binding ItemCode}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CenterTextColumnStyle}"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="품목명" Binding="{Binding ItemName}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CenterTextColumnStyle}"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="규격" Binding="{Binding ItemUnit}" Width="100">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CenterTextColumnStyle}"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="현재 재고"  Binding="{Binding CurrentQty, StringFormat={}{0:N0}}" Width="100">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="Margin" Value="0,0,10,0"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentQty}" Value="0">
+                                    <Setter Property="Foreground" Value="Red"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTemplateColumn Header="입고 처리" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Center" 
+                            Margin="0,2,10,2">
+
+                                    <TextBox Text="{Binding InboundQty, UpdateSourceTrigger=PropertyChanged}" 
+                             Width="60" Height="22" Margin="0,0,5,0"
+                             VerticalContentAlignment="Center" 
+                             HorizontalContentAlignment="Right"/>
+
+                                    <Button Content="입고" 
+                            Command="{Binding DataContext.SaveInboundCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            CommandParameter="{Binding}"
+                            Padding="8,0" Height="22" FontSize="10"
+                            Style="{StaticResource MetroBlueButtonStyle}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#AAFFFFFF" 
+              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+            <Border Background="White" BorderBrush="#0078D7" BorderThickness="1" 
+                    VerticalAlignment="Center" HorizontalAlignment="Center" 
+                    Padding="40,30" CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" Opacity="0.2"/>
+                </Border.Effect>
+                <StackPanel Width="300">
+                    <TextBlock Text="재고 데이터를 처리 중입니다" FontSize="16" FontWeight="Bold" 
+                               Foreground="#333333" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                    <ProgressBar Value="{Binding LoadingProgress}" 
+                                 Minimum="0" Maximum="100" 
+                                 Height="12" Foreground="#0078D7" Background="#EEEEEE"/>
+
+                    <TextBlock Text="{Binding LoadingProgress, StringFormat={}{0:F0}%}" 
+                               HorizontalAlignment="Right" Foreground="#0078D7" 
+                               FontSize="12" FontWeight="Bold" Margin="0,5,0,0"/>
+
+                    <TextBlock Text="{Binding StatisticsSummary}" 
+                               Margin="0,20,0,0" HorizontalAlignment="Center" 
+                               FontSize="11" Foreground="#666666"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

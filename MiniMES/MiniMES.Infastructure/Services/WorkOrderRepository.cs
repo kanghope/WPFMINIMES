@@ -1,11 +1,12 @@
 ﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using MiniMes.Domain.Commons;
+using MiniMes.Domain.DTOs;
 using MiniMes.Infrastructure.Interfaces;
 using MiniMes.Infrastructure.Services;
 using MiniMES.Infastructure.interfaces;
 using System.Configuration;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.IO.Ports;
 
 namespace MiniMES.Infastructure.Services
@@ -29,32 +30,55 @@ namespace MiniMES.Infastructure.Services
         // 작업 시작 프로시저 호출 (새로 생성 필요)
         public async Task StartWorkOrder(int woId, string userId, string eqCode)
         {
-            
+
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                //db.Open();
-                //using (var transaction = db.BeginTransaction())
-                //{
-                    try
+                // Dapper는 Open을 명시적으로 해주는 것이 좋습니다 (Transaction 사용 시 필수)
+                if (db.State == ConnectionState.Closed) db.Open();
+
+                try
+                {
+                    // 1. 작업지시 정보 조회 (Dapper 방식)
+                    // SQL에서 직접 조회하여 ITEM_CODE와 WO_QTY를 가져옵니다.
+                    //var workOrder = await db.QueryFirstOrDefaultAsync("SP_GetWorkOrderInfo", new { WO_ID = woId });
+
+                    var workOrder = await db.QueryFirstOrDefaultAsync(
+                                    "QueryFirstOrDefaultAsync",
+                                    new { WO_ID = woId },
+                                    commandType: CommandType.StoredProcedure
+                         );
+                  
+                    if (workOrder == null)
+                        throw new Exception("작업지시를 찾을 수 없습니다.");
+
+                    // 2. BOM 및 재고 정보 확인 (기존 구현된 SP 활용)
+                    // 동일한 클래스 내의 메소드를 호출할 때는 별도의 필드 주입 없이 바로 호출합니다.
+                    var bomRequirements = await GetBomRequirementAsync(workOrder.ITEM_CODE);
+
+                    foreach (var item in bomRequirements)
                     {
-                        var param = new { WO_ID = woId, USER_ID = userId, EQ_CODE = eqCode };
+                        // SP_GetBomRequirement의 결과 컬럼명: CHILD_ITEM, CONSUMPTION, CURRENT_QTY
+                        decimal requiredQty = (decimal)item.CONSUMPTION * (decimal)workOrder.WO_QTY;
+                        decimal currentStock = (decimal)(item.CURRENT_QTY ?? 0m);
 
-                        await db.ExecuteAsync("SP_StartWorkOrder",
-                                                param,
-                                               //transaction: transaction,
-                                                commandType: CommandType.StoredProcedure);
-
-                        // [핵심] 성공적으로 실행되었다면 반드시 Commit을 호출해야 DB에 반영됩니다.
-                        //transaction.Commit();
-
+                        if (currentStock < requiredQty)
+                        {
+                            throw new Exception($"원재료 재고가 부족합니다.\n품목: {item.CHILD_ITEM}\n필요: {requiredQty}, 현재: {currentStock}");
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        //transaction.Rollback();
-                        // 3. 로그만 남기고 상위(ViewModel)로 던짐
-                        throw new Exception($"작업 시작 DB 반영 실패 (ID: {woId})", ex);
-                    }
-                //}
+
+                    // 3. 재고가 충분하면 SP_StartWorkOrder 호출
+                    var param = new { WO_ID = woId, USER_ID = userId, EQ_CODE = eqCode };
+
+                    await db.ExecuteAsync("SP_StartWorkOrder",
+                                          param,
+                                          commandType: CommandType.StoredProcedure);
+                }
+                catch (Exception ex)
+                {
+                    // 예외를 상위(ViewModel)로 던져서 사용자에게 알림창을 띄울 수 있게 합니다.
+                    throw new Exception(ex.Message, ex);
+                }
             }
         }
 

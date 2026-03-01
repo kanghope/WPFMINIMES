@@ -108,8 +108,15 @@ namespace MiniMes.Client
             MainContent.Content = view;
 
         }
+        // 입고 관리 화면 열기
+        private void OnOpenInventoryViewClick(object sender, RoutedEventArgs e)
+        {
+            var view = new InventoryView();
 
-        
+            view.DataContext = App.ServiceProvider?.GetService<InventoryViewModel>();
+
+            MainContent.Content = view;
+        }
     }
 }
 

@@ -26,6 +26,7 @@ namespace MiniMes.Infrastructure.Data
         public DbSet<UserEntity> Users { get; set; } = null!;           // TB_USER
         public DbSet<WorkOrderEntity> WorkOrders { get; set; } = null!; // TB_WORKORDER
         public DbSet<WorkResultEntity> WorkResults { get; set; } = null!; // TB_WORKRESULT
+        public DbSet<StockEntity> Stocks { get; set; } = null!; //TB_STOCK
         // 추가적인 모델 설정이 필요할 경우 OnModelCreating 오버라이딩
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -48,6 +49,9 @@ namespace MiniMes.Infrastructure.Data
                 .Property(b => b.Consumption)      // "소요량(Consumption) 속성에 대해서..."
                 .HasPrecision(18, 4);               // "전체 18자리 숫자 중 소수점 아래 4자리까지 정밀하게 관리하겠다"
 
+            // 2. StockEntity 정밀도 설정 (재고 수량)
+            modelBuilder.Entity<StockEntity>().Property(s => s.CurrentQty).HasPrecision(18, 4);
+
             // 3. WorkOrder & WorkResult (1:N)
             modelBuilder.Entity<WorkResultEntity>()
                 .HasRequired(r => r.WorkOrder)      // "실적(Result)은 반드시 어떤 지시(Order)에 소속되어야 한다"
@@ -59,6 +63,8 @@ namespace MiniMes.Infrastructure.Data
             // 모든 엔티티에 대해 일일이 설정하거나, 아래처럼 명시
             modelBuilder.Entity<ItemEntity>().Property(e => e.CREATED_AT).HasColumnName("CREATED_AT");
             modelBuilder.Entity<ItemEntity>().Property(e => e.UPDATED_AT).HasColumnName("UPDATED_AT");
+            modelBuilder.Entity<StockEntity>().Property(e => e.CREATED_AT).HasColumnName("CREATED_AT");
+            modelBuilder.Entity<StockEntity>().Property(e => e.UPDATED_AT).HasColumnName("UPDATED_AT");
         }
     }
 }

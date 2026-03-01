@@ -50,6 +50,7 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MainWindow.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Themes\Generic.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\DashboardView.baml
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemSelectView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\LoginView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderEditView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkResultListView.baml
@@ -57,7 +58,9 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkResultR
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MainWindow.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\BomManagementView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\DashboardView.g.cs
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\InventoryView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemManagementView.g.cs
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemSelectView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\LoginView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderEditView.g.cs
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderListView.g.cs
@@ -149,6 +152,7 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\bin\Debug\net10.0-windows\MiniMes.Domain.pd
 D:\WPFMINIMES\MiniMES\MiniMes.Client\bin\Debug\net10.0-windows\MiniMes.Domain.dll.config
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\App.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\BomManagementView.baml
+D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\InventoryView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemManagementView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\WorkOrderListView.baml
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.g.resources
@@ -163,5 +167,3 @@ D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\refint\MiniMes.Cl
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.pdb
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\MiniMes.Client.genruntimeconfig.cache
 D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\ref\MiniMes.Client.dll
-D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemSelectView.baml
-D:\WPFMINIMES\MiniMES\MiniMes.Client\obj\Debug\net10.0-windows\Views\ItemSelectView.g.cs
